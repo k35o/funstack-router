@@ -204,6 +204,58 @@ const productRoute = routeState<{ filter: string }>()({
   ]
 }`}</CodeBlock>
       </article>
+
+      <article className="api-item">
+        <h3>Server Entry Point</h3>
+        <p>
+          The <code>route()</code> and <code>routeState()</code> helpers are
+          also available from a server-compatible entry point. Use this when
+          defining routes in React Server Components or other server-side code.
+        </p>
+        <CodeBlock language="tsx">{`// In Server Components or server-side route definitions
+import { route, routeState } from "@funstack/router/server";
+
+// Define routes without the "use client" directive
+const routes = [
+  route({
+    path: "/",
+    component: HomePage,
+  }),
+  routeState<{ tab: string }>()({
+    path: "/dashboard",
+    component: DashboardPage,
+  }),
+];`}</CodeBlock>
+        <h4>When to Use</h4>
+        <ul>
+          <li>Defining routes in React Server Components</li>
+          <li>Server-side route configuration files</li>
+          <li>
+            Any context where <code>"use client"</code> would cause issues
+          </li>
+        </ul>
+        <h4>Available Exports</h4>
+        <p>
+          The <code>@funstack/router/server</code> entry point exports:
+        </p>
+        <ul>
+          <li>
+            <code>route</code> - Route definition helper
+          </li>
+          <li>
+            <code>routeState</code> - Route definition helper with typed state
+          </li>
+          <li>
+            Types: <code>LoaderArgs</code>, <code>RouteDefinition</code>,{" "}
+            <code>PathParams</code>, <code>RouteComponentProps</code>,{" "}
+            <code>RouteComponentPropsWithData</code>
+          </li>
+        </ul>
+        <p>
+          For client-side features like <code>Router</code>, <code>Outlet</code>
+          , and hooks, use the main <code>@funstack/router</code> entry point.
+        </p>
+      </article>
     </div>
   );
 }
