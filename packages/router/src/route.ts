@@ -1,4 +1,4 @@
-import type { ComponentType } from "react";
+import type { ComponentType, ReactNode } from "react";
 
 const routeDefinitionSymbol = Symbol();
 
@@ -88,7 +88,7 @@ export type RouteDefinition =
   | OpaqueRouteDefinition
   | {
       path: string;
-      component?: ComponentType<object>;
+      component?: ComponentType<object> | ReactNode;
       children?: RouteDefinition[];
     };
 
@@ -100,9 +100,11 @@ export type RouteDefinition =
 type RouteWithLoader<TPath extends string, TData, TState> = {
   path: TPath;
   loader: (args: LoaderArgs) => TData;
-  component: ComponentType<
-    RouteComponentPropsWithData<PathParams<TPath>, TData, TState>
-  >;
+  component:
+    | ComponentType<
+        RouteComponentPropsWithData<PathParams<TPath>, TData, TState>
+      >
+    | ReactNode;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   children?: RouteDefinition[];
 };
@@ -114,7 +116,9 @@ type RouteWithLoader<TPath extends string, TData, TState> = {
  */
 type RouteWithoutLoader<TPath extends string, TState> = {
   path: TPath;
-  component?: ComponentType<RouteComponentProps<PathParams<TPath>, TState>>;
+  component?:
+    | ComponentType<RouteComponentProps<PathParams<TPath>, TState>>
+    | ReactNode;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   children?: RouteDefinition[];
 };

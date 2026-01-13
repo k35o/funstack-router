@@ -106,26 +106,40 @@ type MyParams = PathParams<"/users/:userId">;
           <code>RouteDefinition</code>
         </h3>
         <p>
-          When using the <code>route()</code> or <code>routeState()</code>{" "}
-          helper, component types are inferred automatically. Components always
-          receive <code>params</code>, <code>state</code>, <code>setState</code>
-          , <code>setStateSync</code>, <code>resetState</code>, and{" "}
-          <code>info</code> props, and receive a <code>data</code> prop when a
-          loader is defined.
+          The <code>component</code> field accepts two forms:
         </p>
-        <CodeBlock language="tsx">{`// With loader: component receives { data, params, state, setState, setStateSync, resetState, info }
-// Without loader: component receives { params, state, setState, setStateSync, resetState, info }
-
-// Example without state type:
+        <ul>
+          <li>
+            <strong>Component reference</strong> (e.g.,{" "}
+            <code>component: UserPage</code>): Router automatically injects
+            props (<code>params</code>, <code>state</code>,{" "}
+            <code>setState</code>, <code>setStateSync</code>,{" "}
+            <code>resetState</code>, <code>info</code>, and <code>data</code>{" "}
+            when a loader is defined).
+          </li>
+          <li>
+            <strong>JSX element</strong> (e.g.,{" "}
+            <code>component: &lt;UserPage /&gt;</code>): Rendered as-is without
+            router props injection. Useful for static components or when you
+            want to pass custom props.
+          </li>
+        </ul>
+        <CodeBlock language="tsx">{`// Component reference: router injects props automatically
 route({
   path: "/users/:userId",
-  component: UserPage,  // state is undefined
+  component: UserPage,  // receives { params, state, setState, ... }
 });
 
-// Example with state type:
+// JSX element: rendered as-is, no props injection
+route({
+  path: "/about",
+  component: <AboutPage title="About Us" />,  // custom props only
+});
+
+// With loader and state:
 routeState<{ tab: string }>()({
   path: "/users/:userId",
-  component: UserPage,  // state is { tab: string } | undefined
+  component: UserPage,  // receives { data, params, state, ... }
   loader: () => fetchUser(),
 });`}</CodeBlock>
       </article>

@@ -164,7 +164,6 @@ function RouteRenderer({
   if (!match) return null;
 
   const { route, params, pathname, data } = match;
-  const Component = route.component;
 
   const routerContext = useContext(RouterContext);
   if (!routerContext) {
@@ -247,7 +246,18 @@ function RouteRenderer({
   // Render component with or without data prop based on loader presence
   // Always pass params, state, setState, resetState, and info props to components
   const renderComponent = () => {
-    if (!Component) return outlet;
+    const componentOrElement = route.component;
+
+    if (componentOrElement == null) return outlet;
+
+    // Check if it's a component reference (function) or a ReactNode (JSX element)
+    if (typeof componentOrElement !== "function") {
+      // ReactNode (JSX element, string, number, etc.): render as-is without router props
+      return componentOrElement;
+    }
+
+    // Component reference: inject router props (existing behavior)
+    const Component = componentOrElement;
 
     const stateProps = {
       state: routeState,

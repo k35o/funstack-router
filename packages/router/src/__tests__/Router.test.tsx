@@ -239,4 +239,67 @@ describe("Router", () => {
       );
     });
   });
+
+  describe("JSX element component syntax", () => {
+    it("renders JSX element without props injection", () => {
+      const routes: RouteDefinition[] = [
+        { path: "/", component: <div>JSX Element Home</div> },
+      ];
+
+      render(<Router routes={routes} />);
+      expect(screen.getByText("JSX Element Home")).toBeInTheDocument();
+    });
+
+    it("renders JSX element with custom props", () => {
+      function CustomPage({ message }: { message: string }) {
+        return <div>{message}</div>;
+      }
+
+      const routes: RouteDefinition[] = [
+        { path: "/", component: <CustomPage message="Custom Props Work" /> },
+      ];
+
+      render(<Router routes={routes} />);
+      expect(screen.getByText("Custom Props Work")).toBeInTheDocument();
+    });
+
+    it("still injects router props for component references", () => {
+      mockNavigation = setupNavigationMock("http://localhost/users/456");
+
+      const routes = [
+        route({
+          path: "/users/:id",
+          component: ({ params }) => <div>User: {params.id}</div>,
+        }),
+      ];
+
+      render(<Router routes={routes} />);
+      expect(screen.getByText("User: 456")).toBeInTheDocument();
+    });
+
+    it("renders nested routes with JSX element parent", () => {
+      mockNavigation = setupNavigationMock("http://localhost/child");
+
+      function Layout() {
+        return (
+          <div>
+            <header>Static Header</header>
+            <Outlet />
+          </div>
+        );
+      }
+
+      const routes: RouteDefinition[] = [
+        {
+          path: "/",
+          component: <Layout />,
+          children: [{ path: "child", component: () => <div>Child Page</div> }],
+        },
+      ];
+
+      render(<Router routes={routes} />);
+      expect(screen.getByText("Static Header")).toBeInTheDocument();
+      expect(screen.getByText("Child Page")).toBeInTheDocument();
+    });
+  });
 });
