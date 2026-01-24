@@ -82,10 +82,80 @@ export interface OpaqueRouteDefinition {
 }
 
 /**
+ * Type-carrying route definition created by the `route` helper function when an `id` is provided.
+ * This type carries type information for params, state, and data, enabling type-safe hooks in the future.
+ */
+export interface TypefulOpaqueRouteDefinition<
+  Id extends string,
+  Params extends Record<string, string>,
+  State,
+  Data,
+> {
+  [routeDefinitionSymbol]: {
+    id: Id;
+    params: Params;
+    state: State;
+    data: Data;
+  };
+  path: string;
+  children?: RouteDefinition[];
+}
+
+/** Extract the Id type from a TypefulOpaqueRouteDefinition */
+export type ExtractRouteId<T> =
+  T extends TypefulOpaqueRouteDefinition<
+    infer Id,
+    infer _Params,
+    infer _State,
+    infer _Data
+  >
+    ? Id
+    : never;
+
+/** Extract the Params type from a TypefulOpaqueRouteDefinition */
+export type ExtractRouteParams<T> =
+  T extends TypefulOpaqueRouteDefinition<
+    infer _Id,
+    infer Params,
+    infer _State,
+    infer _Data
+  >
+    ? Params
+    : never;
+
+/** Extract the State type from a TypefulOpaqueRouteDefinition */
+export type ExtractRouteState<T> =
+  T extends TypefulOpaqueRouteDefinition<
+    infer _Id,
+    infer _Params,
+    infer State,
+    infer _Data
+  >
+    ? State
+    : never;
+
+/** Extract the Data type from a TypefulOpaqueRouteDefinition */
+export type ExtractRouteData<T> =
+  T extends TypefulOpaqueRouteDefinition<
+    infer _Id,
+    infer _Params,
+    infer _State,
+    infer Data
+  >
+    ? Data
+    : never;
+
+/**
  * Any route definition defined by user.
  */
 export type RouteDefinition =
   | OpaqueRouteDefinition
+  | TypefulOpaqueRouteDefinition<
+      string,
+      Record<string, string>,
+      unknown,
+      unknown
+    >
   | {
       path: string;
       component?: ComponentType<object> | ReactNode;
@@ -96,8 +166,15 @@ export type RouteDefinition =
  * Route definition with loader - infers TData from loader return type.
  * TPath is used to infer params type from the path pattern.
  * TState is the type of navigation state for this route.
+ * TId is the optional route identifier for type-safe route references.
  */
-type RouteWithLoader<TPath extends string, TData, TState> = {
+type RouteWithLoader<
+  TPath extends string,
+  TData,
+  TState,
+  TId extends string | undefined = undefined,
+> = {
+  id?: TId;
   path: TPath;
   loader: (args: LoaderArgs) => TData;
   component:
@@ -105,7 +182,6 @@ type RouteWithLoader<TPath extends string, TData, TState> = {
         RouteComponentPropsWithData<PathParams<TPath>, TData, TState>
       >
     | ReactNode;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   children?: RouteDefinition[];
 };
 
@@ -113,13 +189,18 @@ type RouteWithLoader<TPath extends string, TData, TState> = {
  * Route definition without loader.
  * TPath is used to infer params type from the path pattern.
  * TState is the type of navigation state for this route.
+ * TId is the optional route identifier for type-safe route references.
  */
-type RouteWithoutLoader<TPath extends string, TState> = {
+type RouteWithoutLoader<
+  TPath extends string,
+  TState,
+  TId extends string | undefined = undefined,
+> = {
+  id?: TId;
   path: TPath;
   component?:
     | ComponentType<RouteComponentProps<PathParams<TPath>, TState>>
     | ReactNode;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   children?: RouteDefinition[];
 };
 
@@ -151,20 +232,32 @@ type RouteWithoutLoader<TPath extends string, TState> = {
  * });
  * ```
  */
-// Overload with loader
+// Overload with id + loader → TypefulOpaqueRouteDefinition
+export function route<TId extends string, TPath extends string, TData>(
+  definition: RouteWithLoader<TPath, TData, undefined, TId> & { id: TId },
+): TypefulOpaqueRouteDefinition<TId, PathParams<TPath>, undefined, TData>;
+// Overload with id + no loader → TypefulOpaqueRouteDefinition
+export function route<TId extends string, TPath extends string>(
+  definition: RouteWithoutLoader<TPath, undefined, TId> & { id: TId },
+): TypefulOpaqueRouteDefinition<TId, PathParams<TPath>, undefined, undefined>;
+// Overload with loader (no id)
 export function route<TPath extends string, TData>(
   definition: RouteWithLoader<TPath, TData, undefined>,
 ): OpaqueRouteDefinition;
-// Overload without loader
+// Overload without loader (no id)
 export function route<TPath extends string>(
   definition: RouteWithoutLoader<TPath, undefined>,
 ): OpaqueRouteDefinition;
 // Implementation
-export function route<TPath extends string, TData>(
+export function route<TId extends string, TPath extends string, TData>(
   definition:
+    | (RouteWithLoader<TPath, TData, undefined, TId> & { id: TId })
+    | (RouteWithoutLoader<TPath, undefined, TId> & { id: TId })
     | RouteWithLoader<TPath, TData, undefined>
     | RouteWithoutLoader<TPath, undefined>,
-): OpaqueRouteDefinition {
+):
+  | TypefulOpaqueRouteDefinition<TId, PathParams<TPath>, undefined, TData>
+  | OpaqueRouteDefinition {
   return definition as unknown as OpaqueRouteDefinition;
 }
 
@@ -193,18 +286,24 @@ export function route<TPath extends string, TData>(
  * ```
  */
 export function routeState<TState>(): {
+  // Overload with id + loader → TypefulOpaqueRouteDefinition
+  <TId extends string, TPath extends string, TData>(
+    definition: RouteWithLoader<TPath, TData, TState, TId> & { id: TId },
+  ): TypefulOpaqueRouteDefinition<TId, PathParams<TPath>, TState, TData>;
+  // Overload with id + no loader → TypefulOpaqueRouteDefinition
+  <TId extends string, TPath extends string>(
+    definition: RouteWithoutLoader<TPath, TState, TId> & { id: TId },
+  ): TypefulOpaqueRouteDefinition<TId, PathParams<TPath>, TState, undefined>;
+  // Overload with loader (no id)
   <TPath extends string, TData>(
     definition: RouteWithLoader<TPath, TData, TState>,
   ): OpaqueRouteDefinition;
+  // Overload without loader (no id)
   <TPath extends string>(
     definition: RouteWithoutLoader<TPath, TState>,
   ): OpaqueRouteDefinition;
 } {
-  return function <TPath extends string, TData>(
-    definition:
-      | RouteWithLoader<TPath, TData, TState>
-      | RouteWithoutLoader<TPath, TState>,
-  ): OpaqueRouteDefinition {
+  return ((definition: object) => {
     return definition as unknown as OpaqueRouteDefinition;
-  };
+  }) as never;
 }
