@@ -37,10 +37,10 @@ export type LoaderArgs<Params extends Record<string, string>> = {
  * Props for route components without loader.
  * Includes navigation state management props.
  */
-export type RouteComponentProps<
+export interface RouteComponentProps<
   TParams extends Record<string, string>,
   TState = undefined,
-> = {
+> {
   /** Extracted path parameters */
   params: TParams;
   /** Current navigation state for this route (undefined on first visit) */
@@ -57,20 +57,20 @@ export type RouteComponentProps<
   resetState: () => void;
   /** Ephemeral navigation info (only available during navigation, not persisted) */
   info: unknown;
-};
+}
 
 /**
  * Props for route components with loader.
  * Includes data from loader and navigation state management props.
  */
-export type RouteComponentPropsWithData<
+export interface RouteComponentPropsWithData<
   TParams extends Record<string, string>,
   TData,
   TState = undefined,
-> = RouteComponentProps<TParams, TState> & {
+> extends RouteComponentProps<TParams, TState> {
   /** Data returned from the loader */
   data: TData;
-};
+}
 
 /**
  * Route definition created by the `route` helper function.
