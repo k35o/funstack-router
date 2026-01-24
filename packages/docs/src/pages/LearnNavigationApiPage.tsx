@@ -170,16 +170,6 @@ function App() {
     navigation.addEventListener(
       "navigatesuccess",
       () => {
-        const transition = navigation.transition;
-
-        // Scroll to top on push/replace navigation
-        if (
-          transition.navigationType === "push" ||
-          transition.navigationType === "replace"
-        ) {
-          window.scrollTo(0, 0);
-        }
-
         // Track page view for analytics
         analytics.trackPageView(location.pathname);
       },
@@ -196,6 +186,12 @@ function App() {
           completes successfully, making it ideal for post-navigation actions.
           You can also use <code>navigation.transition</code> to track in-flight
           navigations or implement loading indicators.
+        </p>
+        <p>
+          <strong>Note:</strong> be careful when adding event listeners for{" "}
+          <code>navigate</code> events since it may interfere with the router's
+          own handling. Consider using <code>onNavigate</code> prop on the{" "}
+          <code>{"<Router>"}</code> component for most use cases.
         </p>
       </section>
 
@@ -220,10 +216,6 @@ function App() {
             <code>navigation.navigate(url, {"{ info }"}))</code>
           </li>
           <li>
-            <strong>updateCurrentEntry()</strong> &mdash; Update the current
-            entry's state without creating a new history entry
-          </li>
-          <li>
             <strong>navigation.entries()</strong> &mdash; Access the full
             navigation history stack programmatically
           </li>
@@ -245,21 +237,11 @@ function App() {
         <h3>Key Takeaways</h3>
         <ul>
           <li>
-            <strong>Navigation API intercepts BEFORE navigation</strong> &mdash;
-            Unlike the History API's reactive <code>popstate</code>, the{" "}
-            <code>navigate</code> event fires before navigation commits
-          </li>
-          <li>
             <strong>
               Native <code>{"<a>"}</code> elements work
             </strong>{" "}
             &mdash; No special Link component required for SPA navigation; the
             router intercepts standard anchor tags automatically
-          </li>
-          <li>
-            <strong>Single unified event</strong> &mdash; All navigation types
-            (push, replace, traverse, reload) trigger the same{" "}
-            <code>navigate</code> event
           </li>
           <li>
             <strong>Direct API access when needed</strong> &mdash; Use events
