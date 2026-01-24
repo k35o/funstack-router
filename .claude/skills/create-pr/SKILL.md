@@ -28,5 +28,5 @@ After merging the pull request, follow these steps so that the local repository 
 
 1. Switch back to the `master` branch.
 2. Pull the latest changes from the remote `master` branch to ensure the local repository is up to date.
-3. Delete the branch that was used for the pull request both locally and remotely.
+3. Delete the local branch that was used for the pull request. (Note: remote branch is automatically deleted by GitHub)
 4. Inform the user that the pull request is merged and the local repository is now up to date and ready for future work.
