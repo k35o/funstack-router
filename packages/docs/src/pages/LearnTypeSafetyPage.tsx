@@ -91,9 +91,10 @@ const userRoute = route({
         <h4>Routes with Loaders</h4>
         <p>
           When your route has a loader function, the component receives the
-          loader's return value as a <code>data</code> prop. The data is wrapped
-          in a Promise, which you unwrap using React's <code>use()</code> hook.
-          Use <code>RouteComponentPropsWithData</code> for routes with loaders.
+          loader's return value as a <code>data</code> prop. The data can be
+          wrapped in a Promise, in which case you unwrap it using React's{" "}
+          <code>use()</code> hook. Use <code>RouteComponentPropsWithData</code>{" "}
+          for routes with loaders.
         </p>
         <CodeBlock language="tsx">{`import { use, Suspense } from "react";
 import { route, RouteComponentPropsWithData } from "@funstack/router";
@@ -447,91 +448,53 @@ function UserPostsPage() {
       </section>
 
       <section>
-        <h3>Type Extraction Utilities</h3>
+        <h3>Route Definition Best Practices</h3>
         <p>
-          FUNSTACK Router exports several utility types for extracting
-          information from route definitions:
+          To maximize developer experience and maintainability while also
+          ensuring type safety, follow the below best practices when defining
+          your routes:
         </p>
+        <CodeBlock language="tsx">{`interface User {
+  name: string;
+}
 
-        <h4>RouteComponentPropsOf</h4>
-        <p>
-          The most useful utility for typing route components is{" "}
-          <code>RouteComponentPropsOf</code>. It extracts the complete props
-          type from a route definition, so you don't have to manually construct{" "}
-          <code>RouteComponentProps</code> or{" "}
-          <code>RouteComponentPropsWithData</code> types.
-        </p>
-        <CodeBlock language="tsx">{`import { route, routeState } from "@funstack/router";
-import type { RouteComponentPropsOf } from "@funstack/router";
+// Define params and data
+type Params = { userId: string };
+type Data = Promise<User>;
+
+// Use RouteComponentProps (or RouteComponentPropsWithData) to type your route component
+type UserPageProps = RouteComponentPropsWithData<Params, Data>;
 
 // Define the route
 const userRoute = route({
-  id: "user",
   path: "/users/:userId",
-  loader: async ({ params }) => {
+  loader: async ({ params }): Data => {
     const response = await fetch(\`/api/users/\${params.userId}\`);
-    return response.json() as Promise<User>;
+    return response.json();
   },
   component: UserPage,
 });
-
-// Extract props type directly from the route
-type UserPageProps = RouteComponentPropsOf<typeof userRoute>;
 
 // Now use it in your component
 function UserPage({ params, data }: UserPageProps) {
   const user = use(data);
   return <h1>User: {user.name} (ID: {params.userId})</h1>;
 }`}</CodeBlock>
+        <p>Key techniques demonstrated here include:</p>
+        <ul>
+          <li>
+            Defining explicit <code>Params</code> and <code>Data</code> types
+            &mdash; requires minimal type checking effort while improving
+            clarity
+          </li>
+          <li>
+            Using <code>RouteComponentPropsWithData</code> to define component
+            props
+          </li>
+        </ul>
         <p>
-          This approach keeps your component props in sync with the route
-          definition automatically. If you change the route's path or loader,
-          the props type updates accordingly.
-        </p>
-        <p>
-          <strong>Note:</strong> <code>RouteComponentPropsOf</code> requires the
-          route to have an <code>id</code> property. Using it with a route
-          without <code>id</code> will result in a type error.
-        </p>
-
-        <h4>Other Extraction Utilities</h4>
-        <p>
-          For more granular type extraction, use these individual utilities:
-        </p>
-        <CodeBlock language="tsx">{`import type {
-  ExtractRouteId,
-  ExtractRouteParams,
-  ExtractRouteState,
-  ExtractRouteData,
-} from "@funstack/router";
-
-const myRoute = routeState<{ page: number }>()(
-  route({
-    id: "myRoute",
-    path: "/items/:itemId",
-    component: ItemPage,
-    loader: async () => ({ items: [] as Item[] }),
-  })
-);
-
-// Extract the route's ID type
-type Id = ExtractRouteId<typeof myRoute>;
-// "myRoute"
-
-// Extract the params type
-type Params = ExtractRouteParams<typeof myRoute>;
-// { itemId: string }
-
-// Extract the state type
-type State = ExtractRouteState<typeof myRoute>;
-// { page: number }
-
-// Extract the loader data type
-type Data = ExtractRouteData<typeof myRoute>;
-// { items: Item[] }`}</CodeBlock>
-        <p>
-          These utilities are helpful when building generic components or
-          utilities that work with different routes.
+          TypeScript will validate that the route definition and component props
+          remain in sync as you make changes over time.
         </p>
       </section>
 
@@ -539,37 +502,19 @@ type Data = ExtractRouteData<typeof myRoute>;
         <h3>Key Takeaways</h3>
         <ul>
           <li>
-            Route params are automatically inferred from path patterns like{" "}
-            <code>:userId</code>
-          </li>
-          <li>
-            Use <code>RouteComponentPropsOf&lt;typeof route&gt;</code> to
-            extract the props type directly from a route definition (requires{" "}
-            <code>id</code>)
-          </li>
-          <li>
-            Alternatively, use{" "}
-            <code>RouteComponentProps&lt;Params, State&gt;</code> or{" "}
+            Use <code>RouteComponentProps&lt;Params, State&gt;</code> or{" "}
             <code>RouteComponentPropsWithData&lt;Params, Data, State&gt;</code>{" "}
-            for manual type construction
+            for constructing route component prop types
           </li>
           <li>
-            Loader data is delivered as a Promise&mdash;use React's{" "}
-            <code>use()</code> with Suspense
-          </li>
-          <li>
-            The <code>routeState</code> helper adds typed state management to
-            any route
+            The <code>routeState</code> helper adds typed route state management
+            to any route
           </li>
           <li>
             Hooks require routes to have an <code>id</code> property for type
             safety
           </li>
           <li>Use hooks to avoid prop drilling or access parent route data</li>
-          <li>
-            Type extraction utilities (<code>ExtractRouteParams</code>, etc.)
-            help build generic route-aware components
-          </li>
         </ul>
       </section>
     </div>
