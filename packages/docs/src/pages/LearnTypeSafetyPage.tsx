@@ -147,9 +147,12 @@ const userRoute = route({
 
         <h4>Routes with Navigation State</h4>
         <p>
-          Navigation state lets you pass temporary data during navigation that
-          doesn't appear in the URL. Use the <code>routeState</code> helper to
-          define typed state for your routes.
+          Navigation state lets you store data in a navigation entry that
+          doesn't appear in the URL. Navigation state data is persisted across
+          page reloads and history traversals (meaning it is available after
+          user goes to another page and then uses the back button to returns to
+          the current page). Use the <code>routeState</code> helper to define
+          typed state for your routes.
         </p>
         <CodeBlock language="tsx">{`import { route, routeState, RouteComponentProps } from "@funstack/router";
 
@@ -328,8 +331,8 @@ const productListRoute = routeState<ProductListState>()(
             need to read data loaded by ancestor routes
           </li>
           <li>
-            <strong>Building reusable components</strong> &mdash; Components
-            that work with specific routes regardless of where they're rendered
+            <strong>Using React Server Components</strong> &mdash; Route
+            components cannot receive props directly
           </li>
         </ul>
         <p>
@@ -529,55 +532,6 @@ type Data = ExtractRouteData<typeof myRoute>;
         <p>
           These utilities are helpful when building generic components or
           utilities that work with different routes.
-        </p>
-      </section>
-
-      <section>
-        <h3>Choosing Between Props and Hooks</h3>
-        <table className="comparison-table">
-          <thead>
-            <tr>
-              <th>Scenario</th>
-              <th>Recommendation</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Route component needs its own params/data/state</td>
-              <td>
-                <strong>Props</strong> &mdash; Direct, simple, no setup required
-              </td>
-            </tr>
-            <tr>
-              <td>Deeply nested component needs route data</td>
-              <td>
-                <strong>Hooks</strong> &mdash; Avoids prop drilling
-              </td>
-            </tr>
-            <tr>
-              <td>Child route needs parent's loader data</td>
-              <td>
-                <strong>Hooks</strong> &mdash; <code>useRouteData</code> with
-                parent route
-              </td>
-            </tr>
-            <tr>
-              <td>Reusable component consuming specific route</td>
-              <td>
-                <strong>Hooks</strong> &mdash; Component is self-contained
-              </td>
-            </tr>
-            <tr>
-              <td>Simple route without nesting</td>
-              <td>
-                <strong>Props</strong> &mdash; Less boilerplate, no ID needed
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <p>
-          When in doubt, start with props. If you find yourself passing route
-          data through many component layers, refactor to use hooks.
         </p>
       </section>
 

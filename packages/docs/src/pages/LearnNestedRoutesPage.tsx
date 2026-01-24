@@ -6,9 +6,9 @@ export function LearnNestedRoutesPage() {
       <h2>Nested Routes</h2>
 
       <p className="page-intro">
-        Nested routes let you build complex page layouts where parts of the UI
-        persist across navigation while other parts change. Think of a dashboard
-        with a sidebar that stays in place while the main content area
+        <b>Nested routes</b> let you build complex page layouts where parts of
+        the UI persist across navigation while other parts change. Think of a
+        dashboard with a sidebar that stays in place while the main content area
         updates&mdash;that's nested routing in action.
       </p>
 
@@ -75,8 +75,8 @@ function DashboardLayout() {
         <h3>Defining Nested Routes</h3>
         <p>
           Nested routes are defined using the <code>children</code> property in
-          your route definitions. Each child route's path is relative to its
-          parent.
+          your route definitions. Each child route's path is{" "}
+          <strong>relative to its parent</strong>.
         </p>
         <CodeBlock language="tsx">{`import { route } from "@funstack/router";
 
@@ -282,52 +282,6 @@ const routes = [
       </section>
 
       <section>
-        <h3>Parameter Inheritance</h3>
-        <p>
-          One of the powerful features of nested routes is parameter
-          inheritance. When a parent route captures a URL parameter, all child
-          routes automatically have access to it.
-        </p>
-        <CodeBlock language="tsx">{`const routes = [
-  route({
-    path: "/users/:userId",
-    component: UserLayout,
-    children: [
-      route({
-        path: "/",
-        component: UserProfile,
-      }),
-      route({
-        path: "/posts",
-        component: UserPosts,
-      }),
-      route({
-        path: "/posts/:postId",
-        component: UserPostDetail,
-      }),
-    ],
-  }),
-];`}</CodeBlock>
-        <p>
-          The <code>UserPostDetail</code> component receives both{" "}
-          <code>userId</code> and <code>postId</code> in its params, even though{" "}
-          <code>userId</code> is defined in the parent route.
-        </p>
-        <CodeBlock language="tsx">{`function UserPostDetail({
-  params,
-}: {
-  params: { userId: string; postId: string };
-}) {
-  return (
-    <article>
-      <h1>Post {params.postId}</h1>
-      <p>By user {params.userId}</p>
-    </article>
-  );
-}`}</CodeBlock>
-      </section>
-
-      <section>
         <h3>Sharing Data with Loaders</h3>
         <p>
           Parent routes can load data that child routes need. This is
@@ -399,8 +353,8 @@ function TeamLayout(props: {
         <h3>Layout Routes Without Paths</h3>
         <p>
           Sometimes you want to wrap a group of routes in a layout without
-          adding a path segment. These are called pathless routes&mdash;routes
-          that provide UI structure without affecting the URL.
+          adding a path segment. These are called <b>pathless routes</b>
+          &mdash;routes that provide UI structure without affecting the URL.
         </p>
         <CodeBlock language="tsx">{`const routes = [
   route({
@@ -574,14 +528,6 @@ function App() {
           <li>Child route paths are relative to their parent route's path</li>
           <li>
             Parent routes use prefix matching; leaf routes use exact matching
-          </li>
-          <li>
-            Use <code>path: "/"</code> for index routes that match the parent's
-            exact path
-          </li>
-          <li>
-            Parameters from parent routes are automatically available to
-            children
           </li>
           <li>Use pathless routes for layouts that don't affect the URL</li>
           <li>
