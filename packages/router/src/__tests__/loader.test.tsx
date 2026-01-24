@@ -63,7 +63,9 @@ describe("Data Loader", () => {
             route({
               path: ":id",
               component: UserDetail,
-              loader: ({ params }) => ({ id: params.id }),
+              loader: ({ params }) => ({
+                id: params.id,
+              }),
             }),
           ],
         }),
@@ -178,7 +180,7 @@ describe("Data Loader", () => {
     it("receives correct params", () => {
       mockNavigation = setupNavigationMock("http://localhost/users/456");
 
-      const loaderSpy = vi.fn((args: LoaderArgs) => ({
+      const loaderSpy = vi.fn((args: LoaderArgs<Record<string, string>>) => ({
         receivedParams: args.params,
       }));
 
@@ -213,7 +215,7 @@ describe("Data Loader", () => {
         "http://localhost/page?foo=bar#section",
       );
 
-      const loaderSpy = vi.fn((args: LoaderArgs) => ({
+      const loaderSpy = vi.fn((args: LoaderArgs<Record<string, string>>) => ({
         url: args.request.url,
       }));
 
@@ -241,7 +243,7 @@ describe("Data Loader", () => {
     });
 
     it("receives AbortSignal", () => {
-      const loaderSpy = vi.fn((args: LoaderArgs) => ({
+      const loaderSpy = vi.fn((args: LoaderArgs<Record<string, string>>) => ({
         hasSignal: args.signal instanceof AbortSignal,
       }));
 
@@ -301,9 +303,11 @@ describe("Data Loader", () => {
     it("caches results per navigation entry id", () => {
       mockNavigation = setupNavigationMock("http://localhost/page1");
 
-      const loaderSpy = vi.fn(({ params }: LoaderArgs) => ({
-        page: params.page,
-      }));
+      const loaderSpy = vi.fn(
+        ({ params }: LoaderArgs<Record<string, string>>) => ({
+          page: params.page,
+        }),
+      );
 
       function Page({ data }: { data: { page: string } }) {
         return <div>Page: {data.page}</div>;
@@ -343,9 +347,11 @@ describe("Data Loader", () => {
     it("calls loader again for new navigation to same URL", () => {
       mockNavigation = setupNavigationMock("http://localhost/page1");
 
-      const loaderSpy = vi.fn(({ params }: LoaderArgs) => ({
-        page: params.page,
-      }));
+      const loaderSpy = vi.fn(
+        ({ params }: LoaderArgs<Record<string, string>>) => ({
+          page: params.page,
+        }),
+      );
 
       function Page({ data }: { data: { page: string } }) {
         return <div>Page: {data.page}</div>;
@@ -417,9 +423,11 @@ describe("Data Loader", () => {
     it("clears loader cache when entry is disposed by navigating from back state", () => {
       mockNavigation = setupNavigationMock("http://localhost/page1");
 
-      const loaderSpy = vi.fn(({ params }: LoaderArgs) => ({
-        page: params.page,
-      }));
+      const loaderSpy = vi.fn(
+        ({ params }: LoaderArgs<Record<string, string>>) => ({
+          page: params.page,
+        }),
+      );
 
       function Page({ data }: { data: { page: string } }) {
         return <div>Page: {data.page}</div>;
@@ -474,9 +482,11 @@ describe("Data Loader", () => {
     it("does not affect cache of other entries when one is disposed", () => {
       mockNavigation = setupNavigationMock("http://localhost/page1");
 
-      const loaderSpy = vi.fn(({ params }: LoaderArgs) => ({
-        page: params.page,
-      }));
+      const loaderSpy = vi.fn(
+        ({ params }: LoaderArgs<Record<string, string>>) => ({
+          page: params.page,
+        }),
+      );
 
       function Page({ data }: { data: { page: string } }) {
         return <div>Page: {data.page}</div>;

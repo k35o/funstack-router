@@ -33,7 +33,7 @@ export type InternalRouteDefinition = {
   // Also, `unknown`s may actually be more specific types. They are guaranteed
   // to be the same type by the `route` helper function.
   /** Data loader function for this route */
-  loader?: (args: LoaderArgs) => unknown;
+  loader?: (args: LoaderArgs<Record<string, string>>) => unknown;
   /** Component to render when this route matches */
   component?:
     | ComponentType<{

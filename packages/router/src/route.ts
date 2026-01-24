@@ -24,9 +24,9 @@ export type PathParams<T extends string> = [ExtractParams<T>] extends [never]
 /**
  * Arguments passed to loader functions.
  */
-export type LoaderArgs = {
+export type LoaderArgs<Params extends Record<string, string>> = {
   /** Extracted path parameters */
-  params: Record<string, string>;
+  params: Params;
   /** Request object with URL and headers */
   request: Request;
   /** AbortSignal for cancellation on navigation */
@@ -199,7 +199,7 @@ type RouteWithLoader<
 > = {
   id?: TId;
   path: TPath;
-  loader: (args: LoaderArgs) => TData;
+  loader: (args: LoaderArgs<PathParams<TPath>>) => TData;
   component:
     | ComponentType<
         RouteComponentPropsWithData<PathParams<TPath>, TData, TState>
@@ -240,7 +240,7 @@ type PathlessRouteWithLoader<
 > = {
   id?: TId;
   path?: undefined;
-  loader: (args: LoaderArgs) => TData;
+  loader: (args: LoaderArgs<Record<string, never>>) => TData;
   component:
     | ComponentType<
         RouteComponentPropsWithData<Record<string, never>, TData, TState>
@@ -315,23 +315,23 @@ export function route(
   definition: PathlessRouteWithoutLoader<undefined>,
 ): OpaqueRouteDefinition;
 // Overload with id + loader → TypefulOpaqueRouteDefinition
-export function route<TId extends string, TPath extends string, TData>(
+export function route<TId extends string, const TPath extends string, TData>(
   definition: RouteWithLoader<TPath, TData, undefined, TId> & { id: TId },
 ): TypefulOpaqueRouteDefinition<TId, PathParams<TPath>, undefined, TData>;
 // Overload with id + no loader → TypefulOpaqueRouteDefinition
-export function route<TId extends string, TPath extends string>(
+export function route<TId extends string, const TPath extends string>(
   definition: RouteWithoutLoader<TPath, undefined, TId> & { id: TId },
 ): TypefulOpaqueRouteDefinition<TId, PathParams<TPath>, undefined, undefined>;
 // Overload with loader (no id)
-export function route<TPath extends string, TData>(
+export function route<const TPath extends string, TData>(
   definition: RouteWithLoader<TPath, TData, undefined>,
 ): OpaqueRouteDefinition;
 // Overload without loader (no id)
-export function route<TPath extends string>(
+export function route<const TPath extends string>(
   definition: RouteWithoutLoader<TPath, undefined>,
 ): OpaqueRouteDefinition;
 // Implementation
-export function route<TId extends string, TPath extends string, TData>(
+export function route<TId extends string, const TPath extends string, TData>(
   definition:
     | (PathlessRouteWithLoader<TData, undefined, TId> & { id: TId })
     | (PathlessRouteWithoutLoader<undefined, TId> & { id: TId })

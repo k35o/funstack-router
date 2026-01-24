@@ -19,7 +19,7 @@ function getOrCreateLoaderResult(
   entryId: string,
   matchIndex: number,
   route: InternalRouteDefinition,
-  args: LoaderArgs,
+  args: LoaderArgs<Record<string, string>>,
 ): unknown | undefined {
   if (!route.loader) {
     return undefined;
@@ -55,7 +55,11 @@ export function executeLoaders(
 ): MatchedRouteWithData[] {
   return matchedRoutes.map((match, index) => {
     const { route, params } = match;
-    const args: LoaderArgs = { params, request, signal };
+    const args: LoaderArgs<Record<string, string>> = {
+      params,
+      request,
+      signal,
+    };
     const data = getOrCreateLoaderResult(entryId, index, route, args);
 
     return { ...match, data };
