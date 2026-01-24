@@ -4,6 +4,7 @@ import { Outlet, useLocation } from "@funstack/router";
 const navItems = [
   { path: "/funstack-router/", label: "Home" },
   { path: "/funstack-router/getting-started", label: "Getting Started" },
+  { path: "/funstack-router/learn", label: "Learn" },
   { path: "/funstack-router/api", label: "API Reference" },
   { path: "/funstack-router/examples", label: "Examples" },
 ];
@@ -16,6 +17,10 @@ export function Layout() {
     // Handle API Reference section (match any /api/* path)
     if (path === "/funstack-router/api") {
       return location.pathname.startsWith("/funstack-router/api");
+    }
+    // Handle Learn section (match any /learn/* path)
+    if (path === "/funstack-router/learn") {
+      return location.pathname.startsWith("/funstack-router/learn");
     }
     // Handle home path
     if (path === "/funstack-router/") {
