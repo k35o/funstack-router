@@ -61,9 +61,3 @@ The router uses two React contexts:
 ### Testing
 
 Tests run in jsdom with `urlpattern-polyfill` (Navigation API is not available, so tests mock navigation behavior via `packages/router/src/__tests__/setup.ts`).
-
-## Development Guidelines
-
-### Documentation Updates
-
-When adding a new feature to the router, you must also update the documentation in `packages/docs` to reflect the changes. This ensures users can discover and learn how to use new functionality.

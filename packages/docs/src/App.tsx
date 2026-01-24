@@ -7,6 +7,8 @@ import { ApiComponentsPage } from "./pages/ApiComponentsPage.js";
 import { ApiHooksPage } from "./pages/ApiHooksPage.js";
 import { ApiUtilitiesPage } from "./pages/ApiUtilitiesPage.js";
 import { ApiTypesPage } from "./pages/ApiTypesPage.js";
+import { LearnPage } from "./pages/LearnPage.js";
+import { LearnNestedRoutesPage } from "./pages/LearnNestedRoutesPage.js";
 import { ExamplesPage } from "./pages/ExamplesPage.js";
 import { useEffect } from "react";
 
@@ -22,6 +24,16 @@ const routes = [
       route({
         path: "/getting-started",
         component: GettingStartedPage,
+      }),
+      route({
+        path: "/learn",
+        component: LearnPage,
+        children: [
+          route({
+            path: "/nested-routes",
+            component: LearnNestedRoutesPage,
+          }),
+        ],
       }),
       route({
         path: "/api",
