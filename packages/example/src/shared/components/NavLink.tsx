@@ -24,7 +24,7 @@ const baseStyle: CSSProperties = {
 
 const inactiveStyle: CSSProperties = {
   ...baseStyle,
-  color: "#333",
+  color: "white",
   backgroundColor: "transparent",
 };
 
