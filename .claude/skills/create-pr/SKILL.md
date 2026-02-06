@@ -20,7 +20,9 @@ Then inform the user that the pull request has been created successfully, provid
 
 ## Merging the Pull Request
 
-After the user reviews the pull request and requests to merge it, you can use the `gh` CLI to merge the pull request. Confirm with the user before merging.
+After the user reviews the pull request and requests to merge it, you can use the `gh` CLI to merge the pull request.
+
+Before merging, ensure that CI checks have passed.
 
 ## Steps After Merging the Pull Request
 
