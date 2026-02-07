@@ -19,15 +19,15 @@ import { LearnTransitionsPage } from "./pages/LearnTransitionsPage.js";
 import { ExamplesPage } from "./pages/ExamplesPage.js";
 import { NotFoundPage } from "./pages/NotFoundPage.js";
 import { ClientApp } from "./ClientApp.js";
-import { Suspense } from "react";
 import { Outlet } from "@funstack/router";
 
 const routes = [
   route({
     component: (
-      <Suspense fallback={null}>
-        <Outlet />
-      </Suspense>
+      // Note: somehow the Suspense here causes issues with hydration.
+      // <Suspense fallback={null}>
+      <Outlet />
+      // </Suspense>
     ),
     children: [
       route({
