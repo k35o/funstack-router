@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Outlet, useLocationSSR } from "@funstack/router";
 
 const navItems = [
@@ -87,7 +87,9 @@ export function Layout() {
         )}
       </header>
       <main className="main">
-        <Outlet />
+        <Suspense fallback={null}>
+          <Outlet />
+        </Suspense>
       </main>
       {location !== null && (
         <footer className="footer">
