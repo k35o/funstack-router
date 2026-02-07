@@ -19,102 +19,119 @@ import { LearnTransitionsPage } from "./pages/LearnTransitionsPage.js";
 import { ExamplesPage } from "./pages/ExamplesPage.js";
 import { NotFoundPage } from "./pages/NotFoundPage.js";
 import { ClientApp } from "./ClientApp.js";
+import { Suspense } from "react";
+import { Outlet } from "@funstack/router";
 
 const routes = [
   route({
-    component: <Layout />,
+    component: (
+      <Suspense fallback={null}>
+        <Outlet />
+      </Suspense>
+    ),
     children: [
       route({
-        path: "/funstack-router",
+        component: <Layout />,
         children: [
           route({
-            path: "/",
-            component: defer(<HomePage />, { name: "HomePage" }),
-          }),
-          route({
-            path: "/getting-started",
-            component: defer(<GettingStartedPage />, {
-              name: "GettingStartedPage",
-            }),
-          }),
-          route({
-            path: "/learn",
-            component: LearnPage,
+            path: "/funstack-router",
             children: [
               route({
                 path: "/",
-                component: defer(<LearnIndexPage />, {
-                  name: "LearnIndexPage",
+                component: defer(<HomePage />, { name: "HomePage" }),
+              }),
+              route({
+                path: "/getting-started",
+                component: defer(<GettingStartedPage />, {
+                  name: "GettingStartedPage",
                 }),
               }),
               route({
-                path: "/navigation-api",
-                component: defer(<LearnNavigationApiPage />, {
-                  name: "LearnNavigationApiPage",
-                }),
+                path: "/learn",
+                component: LearnPage,
+                children: [
+                  route({
+                    path: "/",
+                    component: defer(<LearnIndexPage />, {
+                      name: "LearnIndexPage",
+                    }),
+                  }),
+                  route({
+                    path: "/navigation-api",
+                    component: defer(<LearnNavigationApiPage />, {
+                      name: "LearnNavigationApiPage",
+                    }),
+                  }),
+                  route({
+                    path: "/nested-routes",
+                    component: defer(<LearnNestedRoutesPage />, {
+                      name: "LearnNestedRoutesPage",
+                    }),
+                  }),
+                  route({
+                    path: "/type-safety",
+                    component: defer(<LearnTypeSafetyPage />, {
+                      name: "LearnTypeSafetyPage",
+                    }),
+                  }),
+                  route({
+                    path: "/server-side-rendering",
+                    component: defer(<LearnSsrPage />, {
+                      name: "LearnSsrPage",
+                    }),
+                  }),
+                  route({
+                    path: "/transitions",
+                    component: defer(<LearnTransitionsPage />, {
+                      name: "LearnTransitionsPage",
+                    }),
+                  }),
+                ],
               }),
               route({
-                path: "/nested-routes",
-                component: defer(<LearnNestedRoutesPage />, {
-                  name: "LearnNestedRoutesPage",
-                }),
+                path: "/api",
+                component: ApiReferencePage,
+                children: [
+                  route({
+                    path: "/",
+                    component: defer(<ApiReferenceIndexPage />, {
+                      name: "ApiReferenceIndexPage",
+                    }),
+                  }),
+                  route({
+                    path: "/components",
+                    component: defer(<ApiComponentsPage />, {
+                      name: "ApiComponentsPage",
+                    }),
+                  }),
+                  route({
+                    path: "/hooks",
+                    component: defer(<ApiHooksPage />, {
+                      name: "ApiHooksPage",
+                    }),
+                  }),
+                  route({
+                    path: "/utilities",
+                    component: defer(<ApiUtilitiesPage />, {
+                      name: "ApiUtilitiesPage",
+                    }),
+                  }),
+                  route({
+                    path: "/types",
+                    component: defer(<ApiTypesPage />, {
+                      name: "ApiTypesPage",
+                    }),
+                  }),
+                ],
               }),
               route({
-                path: "/type-safety",
-                component: defer(<LearnTypeSafetyPage />, {
-                  name: "LearnTypeSafetyPage",
-                }),
+                path: "/examples",
+                component: defer(<ExamplesPage />, { name: "ExamplesPage" }),
               }),
               route({
-                path: "/server-side-rendering",
-                component: defer(<LearnSsrPage />, { name: "LearnSsrPage" }),
-              }),
-              route({
-                path: "/transitions",
-                component: defer(<LearnTransitionsPage />, {
-                  name: "LearnTransitionsPage",
-                }),
+                component: defer(<NotFoundPage />, { name: "NotFoundPage" }),
               }),
             ],
-          }),
-          route({
-            path: "/api",
-            component: ApiReferencePage,
-            children: [
-              route({
-                path: "/",
-                component: defer(<ApiReferenceIndexPage />, {
-                  name: "ApiReferenceIndexPage",
-                }),
-              }),
-              route({
-                path: "/components",
-                component: defer(<ApiComponentsPage />, {
-                  name: "ApiComponentsPage",
-                }),
-              }),
-              route({
-                path: "/hooks",
-                component: defer(<ApiHooksPage />, { name: "ApiHooksPage" }),
-              }),
-              route({
-                path: "/utilities",
-                component: defer(<ApiUtilitiesPage />, {
-                  name: "ApiUtilitiesPage",
-                }),
-              }),
-              route({
-                path: "/types",
-                component: defer(<ApiTypesPage />, { name: "ApiTypesPage" }),
-              }),
-            ],
-          }),
-          route({
-            path: "/examples",
-            component: defer(<ExamplesPage />, { name: "ExamplesPage" }),
-          }),
-          route({
-            component: defer(<NotFoundPage />, { name: "NotFoundPage" }),
           }),
         ],
       }),
