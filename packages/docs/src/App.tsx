@@ -22,7 +22,7 @@ import { ClientApp } from "./ClientApp.js";
 
 const routes = [
   route({
-    component: Layout,
+    component: <Layout />,
     children: [
       route({
         path: "/funstack-router",

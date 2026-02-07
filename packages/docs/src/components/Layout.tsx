@@ -1,104 +1,18 @@
-"use client";
-
-import { Suspense, useState } from "react";
-import { Outlet, useLocationSSR } from "@funstack/router";
-
-const navItems = [
-  { path: "/funstack-router/", label: "Home" },
-  { path: "/funstack-router/getting-started", label: "Getting Started" },
-  { path: "/funstack-router/learn", label: "Learn" },
-  { path: "/funstack-router/api", label: "API Reference" },
-  { path: "/funstack-router/examples", label: "Examples" },
-];
+import { Suspense } from "react";
+import { Outlet } from "@funstack/router";
+import { Header } from "./Header.js";
+import { Footer } from "./Footer.js";
 
 export function Layout() {
-  const location = useLocationSSR();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const isActive = (path: string) => {
-    if (location === null) return false;
-    // Handle API Reference section (match any /api/* path)
-    if (path === "/funstack-router/api") {
-      return location.pathname.startsWith("/funstack-router/api");
-    }
-    // Handle Learn section (match any /learn/* path)
-    if (path === "/funstack-router/learn") {
-      return location.pathname.startsWith("/funstack-router/learn");
-    }
-    // Handle home path
-    if (path === "/funstack-router/") {
-      return (
-        location.pathname === "/funstack-router/" ||
-        location.pathname === "/funstack-router"
-      );
-    }
-    return location.pathname === path;
-  };
-
-  const closeMenu = () => setIsMenuOpen(false);
-
   return (
     <div className="layout">
-      <header className="header">
-        <div className="header-content">
-          <h1 className="logo">
-            <a href="/funstack-router/">FUNSTACK Router</a>
-          </h1>
-          <nav className="nav">
-            {navItems.map((item) => (
-              <a
-                key={item.path}
-                href={item.path}
-                className={`nav-link ${isActive(item.path) ? "active" : ""}`}
-              >
-                {item.label}
-              </a>
-            ))}
-          </nav>
-          <a
-            href="https://github.com/uhyo/funstack-router"
-            className="github-link"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            GitHub
-          </a>
-          <button
-            className="hamburger"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle navigation menu"
-          >
-            {isMenuOpen ? "✕" : "☰"}
-          </button>
-        </div>
-        {isMenuOpen && (
-          <nav className="mobile-nav">
-            {navItems.map((item) => (
-              <a
-                key={item.path}
-                href={item.path}
-                className={`mobile-nav-link ${isActive(item.path) ? "active" : ""}`}
-                onClick={closeMenu}
-              >
-                {item.label}
-              </a>
-            ))}
-          </nav>
-        )}
-      </header>
+      <Header />
       <main className="main">
         <Suspense fallback={null}>
           <Outlet />
         </Suspense>
       </main>
-      {location !== null && (
-        <footer className="footer">
-          <p>
-            Built with <strong>@funstack/router</strong> &mdash; A modern React
-            router based on the Navigation API
-          </p>
-        </footer>
-      )}
+      <Footer />
     </div>
   );
 }
