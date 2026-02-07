@@ -437,6 +437,15 @@ function TeamLayout(props: {
           <li>Context providers that supply data to a group of routes</li>
           <li>Error boundaries for a subset of your application</li>
         </ul>
+        <p>
+          Pathless routes also play a key role in server-side rendering. During
+          SSR, only pathless routes render (since no URL is available on the
+          server), making them ideal for defining the app shell. See the{" "}
+          <a href="/funstack-router/learn/server-side-rendering">
+            Server-Side Rendering
+          </a>{" "}
+          page for details.
+        </p>
       </section>
 
       <section>
