@@ -9,8 +9,8 @@ export function LearnTransitionsPage() {
 
       <p className="page-intro">
         FUNSTACK Router wraps every navigation in React's{" "}
-        <code>startTransition</code>, which means the old UI stays visible while
-        the new route loads. This page explains how this works and how to
+        <code>startTransition</code>, which means the old UI may stay visible
+        while the new route loads. This page explains how this works and how to
         control it.
       </p>
 
@@ -19,9 +19,9 @@ export function LearnTransitionsPage() {
         <p>
           When the user navigates, the Router updates its location state inside{" "}
           <code>startTransition()</code>. This means React treats every
-          navigation as a transition: if the new route suspends (e.g., loading
-          data with <code>use()</code>), React keeps the old UI visible instead
-          of immediately showing a Suspense fallback.
+          navigation as a transition: if an existing Suspense boundary suspends
+          (e.g., a component loading data with <code>use()</code>), React keeps
+          the old UI visible instead of immediately showing the fallback.
         </p>
         <p>
           Consider a route with a loader that fetches data. The component uses{" "}
@@ -33,11 +33,21 @@ export function LearnTransitionsPage() {
   route({
     path: "/user/:id",
     loader: ({ params }) => fetchUser(params.id),
-    component: UserPage,
+    component: UserDetailPage,
   }),
 ];
 
-function UserPage({ data }: { data: Promise<User> }) {
+// The route component receives the Promise and provides a Suspense boundary
+function UserDetailPage({ data }: { data: Promise<User> }) {
+  return (
+    <Suspense fallback={<p>Loading...</p>}>
+      <UserDetail data={data} />
+    </Suspense>
+  );
+}
+
+// A child component uses use() to read the data
+function UserDetail({ data }: { data: Promise<User> }) {
   const user = use(data);
   return <div>{user.name}</div>;
 }
