@@ -59,6 +59,19 @@ export function LearnIndexPage() {
           hydration.
         </p>
       </section>
+      <section className="learn-category">
+        <h2>
+          <a href="/funstack-router/learn/transitions">
+            Controlling Transitions
+          </a>
+        </h2>
+        <p>
+          Learn how FUNSTACK Router uses React transitions to keep the old UI
+          visible during navigation. Discover how to show pending indicators
+          with <code>useIsPending</code> and how to opt out of transitions by
+          keying Suspense boundaries.
+        </p>
+      </section>
     </div>
   );
 }

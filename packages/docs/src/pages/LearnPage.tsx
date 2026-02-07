@@ -10,6 +10,7 @@ const learnNavItems = [
     path: "/funstack-router/learn/server-side-rendering",
     label: "Server-Side Rendering",
   },
+  { path: "/funstack-router/learn/transitions", label: "Transitions" },
 ];
 
 export function LearnPage() {

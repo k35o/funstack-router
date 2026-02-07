@@ -15,6 +15,7 @@ import { LearnNavigationApiPage } from "./pages/LearnNavigationApiPage.js";
 import { LearnNestedRoutesPage } from "./pages/LearnNestedRoutesPage.js";
 import { LearnTypeSafetyPage } from "./pages/LearnTypeSafetyPage.js";
 import { LearnSsrPage } from "./pages/LearnSsrPage.js";
+import { LearnTransitionsPage } from "./pages/LearnTransitionsPage.js";
 import { ExamplesPage } from "./pages/ExamplesPage.js";
 import { NotFoundPage } from "./pages/NotFoundPage.js";
 import { ClientApp } from "./ClientApp.js";
@@ -67,6 +68,12 @@ const routes = [
               route({
                 path: "/server-side-rendering",
                 component: defer(<LearnSsrPage />, { name: "LearnSsrPage" }),
+              }),
+              route({
+                path: "/transitions",
+                component: defer(<LearnTransitionsPage />, {
+                  name: "LearnTransitionsPage",
+                }),
               }),
             ],
           }),
