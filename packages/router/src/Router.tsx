@@ -50,6 +50,12 @@ export type RouterProps = {
   fallback?: FallbackMode;
 };
 
+/**
+ * Initial value of locationEntry.
+ * This value means to use the `initialEntry` from `useSyncExternalStore` instead.
+ */
+const entryInitValue = Symbol();
+
 export function Router({
   routes: inputRoutes,
   onNavigate,
@@ -72,9 +78,13 @@ export function Router({
   );
 
   const [isPending, startTransition] = useTransition();
-  const [locationEntry, setLocationEntry] = useState<LocationEntry | null>(
-    initialEntry,
-  );
+  const [locationEntryInternal, setLocationEntry] = useState<
+    LocationEntry | null | typeof entryInitValue
+  >(entryInitValue);
+  const locationEntry =
+    locationEntryInternal === entryInitValue
+      ? initialEntry
+      : locationEntryInternal;
 
   // Subscribe to navigation changes (wrapped in transition)
   useEffect(() => {
@@ -139,7 +149,7 @@ export function Router({
     })();
 
     const routerContextValue = {
-      locationEntry,
+      locationEntry: locationEntry,
       url: locationEntry?.url ?? null,
       isPending,
       navigate,
