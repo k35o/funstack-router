@@ -55,21 +55,15 @@ export function LearnSsrPage() {
         </p>
         <p>
           Consider the following route tree. During SSR, only the pathless{" "}
-          <code>AppShell</code> route renders. The root layout and page routes
-          require a URL to match, so they are skipped:
+          <code>AppShell</code> route renders. The page routes require a URL to
+          match, so they are skipped:
         </p>
         <CodeBlock language="tsx">{`const routes = [
   route({
-    path: "/",
-    component: RootLayout, // Has path — does NOT render during SSR
+    component: AppShell, // Pathless — renders during SSR ✓
     children: [
-      route({
-        component: AppShell, // Pathless — renders during SSR ✓
-        children: [
-          route({ path: "/", component: HomePage }),
-          route({ path: "/about", component: AboutPage }),
-        ],
-      }),
+      route({ path: "/", component: HomePage }),   // Has path — skipped during SSR
+      route({ path: "/about", component: AboutPage }), // Has path — skipped during SSR
     ],
   }),
 ];`}</CodeBlock>
