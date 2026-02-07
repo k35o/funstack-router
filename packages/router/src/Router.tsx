@@ -28,9 +28,6 @@ import { createAdapter } from "./core/createAdapter.js";
 import { executeLoaders, createLoaderRequest } from "./core/loaderCache.js";
 import type { RouteDefinition } from "./route.js";
 
-const noopSubscribe = () => () => {};
-const getServerSnapshot = () => null;
-
 export type RouterProps = {
   routes: RouteDefinition[];
   /**
@@ -51,10 +48,13 @@ export type RouterProps = {
 };
 
 /**
- * Initial value of locationEntry.
- * This value means to use the `initialEntry` from `useSyncExternalStore` instead.
+ * Special value returned as server snapshot during SSR/hydration.
  */
-const entryInitValue = Symbol();
+const serverSnapshotSymbol = Symbol();
+
+const noopSubscribe = () => () => {};
+const getServerSnapshot = (): typeof serverSnapshotSymbol =>
+  serverSnapshotSymbol;
 
 export function Router({
   routes: inputRoutes,
@@ -71,20 +71,33 @@ export function Router({
 
   // Hydration-aware initial value: null during SSR/hydration, real on client-only mount
   const getSnapshot = useCallback(() => adapter.getSnapshot(), [adapter]);
-  const initialEntry = useSyncExternalStore(
-    noopSubscribe,
-    getSnapshot,
-    getServerSnapshot,
-  );
+  const initialEntry = useSyncExternalStore<
+    LocationEntry | null | typeof serverSnapshotSymbol
+  >(noopSubscribe, getSnapshot, getServerSnapshot);
 
   const [isPending, startTransition] = useTransition();
   const [locationEntryInternal, setLocationEntry] = useState<
-    LocationEntry | null | typeof entryInitValue
-  >(entryInitValue);
+    LocationEntry | null | typeof serverSnapshotSymbol
+  >(initialEntry);
   const locationEntry =
-    locationEntryInternal === entryInitValue
-      ? initialEntry
+    locationEntryInternal === serverSnapshotSymbol
+      ? null
       : locationEntryInternal;
+
+  if (
+    locationEntryInternal === serverSnapshotSymbol &&
+    initialEntry !== serverSnapshotSymbol
+  ) {
+    // On second hydrated render on client, sync state with real snapshot
+    // Rendering flow on hydration:
+    // 1. Hydrated Render 1: initialEntry = serverSnapshotSymbol, locationEntryInternal = serverSnapshotSymbol
+    // 2. Render 1 is committed
+    // 3. Hydrated Render 2: initialEntry = client snapshot, locationEntryInternal = serverSnapshotSymbol
+    // 4. This `if` block runs, updating state to client snapshot
+    // 5. Hydrated Render 2 (retry): initialEntry = client snapshot, locationEntryInternal = client snapshot
+    // 6. Render 2 is committed
+    setLocationEntry(initialEntry);
+  }
 
   // Subscribe to navigation changes (wrapped in transition)
   useEffect(() => {
