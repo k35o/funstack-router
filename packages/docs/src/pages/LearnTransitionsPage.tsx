@@ -21,7 +21,12 @@ export function LearnTransitionsPage() {
           <code>startTransition()</code>. This means React treats every
           navigation as a transition: if an existing Suspense boundary suspends
           (e.g., a component loading data with <code>use()</code>), React keeps
-          the old UI visible instead of immediately showing the fallback.
+          the old UI visible instead of immediately showing the fallback. This
+          behavior is{" "}
+          <a href="https://react.dev/reference/react/useTransition#building-a-suspense-enabled-router">
+            what React recommends for Suspense-enabled routers
+          </a>
+          .
         </p>
         <p>
           Consider a route with a loader that fetches data. The component uses{" "}
