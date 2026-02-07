@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useLocationSSR } from "@funstack/router";
+import { useCurrentPath } from "../hooks/useCurrentPath";
 
 const navItems = [
   { path: "/funstack-router/", label: "Home" },
@@ -12,27 +12,27 @@ const navItems = [
 ];
 
 export function Header() {
-  const location = useLocationSSR();
+  const currentPath = useCurrentPath();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const isActive = (path: string) => {
-    if (location === null) return false;
+    if (currentPath === null) return false;
     // Handle API Reference section (match any /api/* path)
     if (path === "/funstack-router/api") {
-      return location.pathname.startsWith("/funstack-router/api");
+      return currentPath.startsWith("/funstack-router/api");
     }
     // Handle Learn section (match any /learn/* path)
     if (path === "/funstack-router/learn") {
-      return location.pathname.startsWith("/funstack-router/learn");
+      return currentPath.startsWith("/funstack-router/learn");
     }
     // Handle home path
     if (path === "/funstack-router/") {
       return (
-        location.pathname === "/funstack-router/" ||
-        location.pathname === "/funstack-router"
+        currentPath === "/funstack-router/" ||
+        currentPath === "/funstack-router"
       );
     }
-    return location.pathname === path;
+    return currentPath === path;
   };
 
   const closeMenu = () => setIsMenuOpen(false);

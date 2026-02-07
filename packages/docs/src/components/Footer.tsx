@@ -1,11 +1,11 @@
 "use client";
 
-import { useLocationSSR } from "@funstack/router";
+import { useCurrentPath } from "../hooks/useCurrentPath";
 
 export function Footer() {
-  const location = useLocationSSR();
+  const currentPath = useCurrentPath();
 
-  if (location === null) return null;
+  if (currentPath === null) return null;
 
   return (
     <footer className="footer">
