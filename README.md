@@ -47,8 +47,8 @@ pnpm test
 ## Quick Start
 
 ```tsx
-import { Router, Outlet } from "@funstack/router";
-import type { RouteDefinition } from "@funstack/router";
+import { Router, Outlet, route } from "@funstack/router";
+import type { RouteDefinition, RouteComponentProps } from "@funstack/router";
 
 function Layout() {
   return (
@@ -71,20 +71,20 @@ function Users() {
   return <h1>Users</h1>;
 }
 
-function UserDetail({ params }: { params: { id: string } }) {
+function UserDetail({ params }: RouteComponentProps<{ id: string }>) {
   return <h1>User {params.id}</h1>;
 }
 
 const routes: RouteDefinition[] = [
-  {
+  route({
     path: "/",
     component: Layout,
     children: [
-      { path: "", component: Home },
-      { path: "users", component: Users },
-      { path: "users/:id", component: UserDetail },
+      route({ path: "", component: Home }),
+      route({ path: "users", component: Users }),
+      route({ path: "users/:id", component: UserDetail }),
     ],
-  },
+  }),
 ];
 
 function App() {
@@ -150,13 +150,57 @@ const location = useLocation();
 // { pathname: "/users", search: "?page=1", hash: "#section" }
 ```
 
-#### `useParams()`
+#### `useRouteParams(route)`
 
-Returns the current route's path parameters. Note that route components also receive `params` as a prop, so this hook is mainly useful for non-route components that need access to params.
+Returns typed route parameters for a route definition created with `route()` and an `id`. The route definition is used to infer the parameter types.
 
 ```tsx
-// Route: /users/:id
-const { id } = useParams<{ id: string }>();
+const userRoute = route({
+  id: "user",
+  path: "users/:userId",
+  component: UserPage,
+});
+
+function UserPage() {
+  const params = useRouteParams(userRoute);
+  // params is typed as { userId: string }
+}
+```
+
+#### `useRouteState(route)`
+
+Returns typed navigation state for a route definition. State is tied to the navigation history entry and persists across back/forward navigation.
+
+```tsx
+type ScrollState = { scrollPos: number };
+const scrollRoute = routeState<ScrollState>()({
+  id: "scroll",
+  path: "/scroll",
+  component: ScrollPage,
+});
+
+function ScrollPage() {
+  const state = useRouteState(scrollRoute);
+  // state is typed as ScrollState | undefined
+}
+```
+
+#### `useRouteData(route)`
+
+Returns typed loader data for a route definition.
+
+```tsx
+const userRoute = route({
+  id: "user",
+  path: "users/:userId",
+  loader: async ({ params }) => fetchUser(params.userId),
+  component: UserPage,
+});
+
+function UserPage() {
+  const data = useRouteData(userRoute);
+  // data is typed based on the loader return type
+}
 ```
 
 #### `useSearchParams()`
@@ -179,36 +223,143 @@ setSearchParams((prev) => {
 });
 ```
 
-### Types
+#### `useIsPending()`
 
-#### `RouteDefinition`
+Returns whether a navigation transition is currently pending.
 
-Route components receive a `params` prop with the matched path parameters. Use the `route()` helper for type-safe route definitions:
+```tsx
+const isPending = useIsPending();
+```
+
+#### `useBlocker(options)`
+
+Blocks navigation away from the current route. Useful for scenarios like unsaved form data.
+
+Note: This hook only handles SPA navigations. For hard navigations (tab close, refresh), handle `beforeunload` separately.
+
+```tsx
+useBlocker({
+  shouldBlock: () => {
+    if (isDirty) {
+      return !confirm("You have unsaved changes. Leave anyway?");
+    }
+    return false;
+  },
+});
+```
+
+### Route Definition Helpers
+
+#### `route()`
+
+Helper function for creating type-safe route definitions. Path parameters are inferred from the path pattern.
 
 ```typescript
 import { route } from "@funstack/router";
 
-// Route without loader - component receives params prop
+// Route without loader
 route({
   path: "users/:id",
-  component: UserDetail, // receives { params: { id: string } }
+  component: UserDetail, // receives RouteComponentProps<{ id: string }>
 });
 
-// Route with loader - component receives both data and params props
+// Route with loader
 route({
   path: "users/:id",
-  loader: async ({ params }) => fetchUser(params.id),
-  component: UserDetail, // receives { data: Promise<User>, params: { id: string } }
+  loader: async ({ params, signal }) => fetchUser(params.id),
+  component: UserDetail, // receives RouteComponentPropsWithData<{ id: string }, User>
+});
+
+// Route with id (enables type-safe hooks like useRouteParams)
+route({
+  id: "user",
+  path: "users/:id",
+  component: UserDetail,
+});
+
+// Pathless route (always matches, useful for layout wrappers)
+route({
+  component: Layout,
+  children: [
+    /* ... */
+  ],
 });
 ```
 
-You can also define routes as plain objects (without type inference):
+**Route options:**
+
+| Option            | Type                         | Description                                                      |
+| ----------------- | ---------------------------- | ---------------------------------------------------------------- |
+| `path`            | `string`                     | URL path pattern (e.g., `"users/:id"`). Omit for pathless routes |
+| `component`       | `ComponentType \| ReactNode` | Component to render or JSX element                               |
+| `children`        | `RouteDefinition[]`          | Nested child routes                                              |
+| `loader`          | `(args: LoaderArgs) => T`    | Data loader function                                             |
+| `id`              | `string`                     | Route identifier for type-safe hooks                             |
+| `exact`           | `boolean`                    | Override matching (default: exact for leaf, prefix for parent)   |
+| `requireChildren` | `boolean`                    | Whether parent requires a child to match (default: `true`)       |
+
+#### `routeState<TState>()`
+
+Curried helper for creating routes with typed navigation state.
 
 ```typescript
-type RouteDefinition = {
-  path: string;
-  component?: React.ComponentType<{ params: Record<string, string> }>;
-  children?: RouteDefinition[];
+import { routeState } from "@funstack/router";
+
+type FilterState = { filter: string };
+
+const productRoute = routeState<FilterState>()({
+  id: "products",
+  path: "products",
+  loader: async () => fetchProducts(),
+  component: ProductList, // receives { data, params, state: FilterState | undefined, setState, ... }
+});
+```
+
+### Types
+
+#### `RouteComponentProps`
+
+Props passed to route components without a loader.
+
+```typescript
+interface RouteComponentProps<TParams, TState = undefined> {
+  params: TParams;
+  state: TState | undefined;
+  setState: (
+    state: TState | ((prev: TState | undefined) => TState),
+  ) => Promise<void>;
+  setStateSync: (
+    state: TState | ((prev: TState | undefined) => TState),
+  ) => void;
+  resetState: () => void;
+  info: unknown;
+  isPending: boolean;
+}
+```
+
+#### `RouteComponentPropsWithData`
+
+Props passed to route components with a loader. Extends `RouteComponentProps` with a `data` field.
+
+```typescript
+interface RouteComponentPropsWithData<
+  TParams,
+  TData,
+  TState = undefined,
+> extends RouteComponentProps<TParams, TState> {
+  data: TData;
+}
+```
+
+#### `LoaderArgs`
+
+Arguments passed to loader functions.
+
+```typescript
+type LoaderArgs<Params> = {
+  params: Params;
+  request: Request;
+  signal: AbortSignal;
 };
 ```
 
@@ -228,6 +379,7 @@ type Location = {
 type NavigateOptions = {
   replace?: boolean;
   state?: unknown;
+  info?: unknown;
 };
 ```
 
