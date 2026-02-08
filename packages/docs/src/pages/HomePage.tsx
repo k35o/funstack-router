@@ -21,10 +21,9 @@ export function HomePage() {
           className="hero-image"
         />
         <p>
-          FUNSTACK Router is in a <strong>PoC stage</strong> and is not yet
-          recommended for production use. It aims to provide a picture of a
-          modern routing solution for React applications by leveraging the
-          latest web APIs.
+          FUNSTACK Router is a lightweight SPA router for React built on the
+          Navigation API. It aims to provide a picture of a modern routing
+          solution for React applications by leveraging the latest web APIs.
         </p>
         <div className="hero-buttons">
           <a href="/funstack-router/getting-started" className="button primary">
@@ -66,6 +65,14 @@ export function HomePage() {
               Built-in async data loading with loaders that run before route
               components render.
             </p>
+          </div>
+          <div className="feature-card">
+            <h3>Transitions</h3>
+            <p>Integrates nicely with React Suspense and transitions.</p>
+          </div>
+          <div className="feature-card">
+            <h3>RSC Compatible</h3>
+            <p>Designed to work also with React Server Components.</p>
           </div>
         </div>
       </section>

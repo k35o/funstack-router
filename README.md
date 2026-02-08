@@ -4,17 +4,15 @@
 
 A modern React router built on the [Navigation API](https://developer.mozilla.org/en-US/docs/Web/API/Navigation_API).
 
-> **Warning**
-> This project is in early development and is not ready for production use. APIs may change without notice.
-
 ## Features
 
-- **Navigation API based** - Uses the modern Navigation API instead of the History API
+- **Navigation API based** - Uses the modern Navigation API (supported by Chrome, Firefox and Safari 26.2+)
 - **Native `<a>` tags just work** - No special `<Link>` component needed; use standard HTML links
 - **Object-based routes** - Define routes as plain JavaScript objects
 - **Nested routing** - Support for layouts and nested routes with `<Outlet>`
 - **Type-safe** - Full TypeScript support
 - **Lightweight** - Minimal API surface
+- **RSC Compatible** - Designed to work also with React Server Components
 
 ## Installation
 
@@ -44,6 +42,7 @@ pnpm test
 
 - `packages/router` - The main `@funstack/router` library
 - `packages/example` - Example application
+- `packages/docs` - Documentation site
 
 ## Quick Start
 
@@ -241,16 +240,6 @@ FUNSTACK Router uses the [URLPattern API](https://developer.mozilla.org/en-US/do
 | `/users`     | `/users`       | Exact match     |
 | `/users/:id` | `/users/123`   | Named parameter |
 | `/files/*`   | `/files/a/b/c` | Wildcard        |
-
-## Browser Support
-
-The Navigation API is supported in:
-
-- Chrome 102+
-- Edge 102+
-- Firefox 147+
-- Safari 26.2+
-- Opera 88+
 
 ## License
 
