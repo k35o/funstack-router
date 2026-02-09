@@ -47,8 +47,8 @@ export function LearnRscPage() {
           tree in a server module:
         </p>
         <CodeBlock language="tsx">{`// App.tsx — a Server Component (no "use client" directive)
+import { Router } from "@funstack/router";
 import { route } from "@funstack/router/server";
-import { ClientApp } from "./ClientApp.js";
 
 const routes = [
   route({
@@ -62,12 +62,15 @@ const routes = [
 ];
 
 export default function App() {
-  return <ClientApp routes={routes} />;
+  return <Router routes={routes} />;
 }`}</CodeBlock>
         <p>
           In this example, <code>App</code> is a server component. It builds the
-          route array on the server side and passes it to <code>ClientApp</code>
-          , which renders the actual <code>Router</code>.
+          route array using <code>route()</code> from{" "}
+          <code>@funstack/router/server</code> and renders the{" "}
+          <code>Router</code> component from <code>@funstack/router</code>.
+          Since <code>Router</code> is a client component, the RSC bundler
+          handles the client boundary automatically.
         </p>
         <h4>What the server entry point exports</h4>
         <ul>
@@ -90,24 +93,16 @@ export default function App() {
       <section>
         <h3>The Client Boundary</h3>
         <p>
-          The <code>Router</code> component is a client component &mdash; it
-          subscribes to the Navigation API and manages React state. You need a
-          thin client wrapper that receives the route definitions from the
-          server and renders the router:
+          The <code>Router</code> component subscribes to the Navigation API and
+          manages React state, so it is a client component. It serves as the
+          client boundary in your component tree &mdash; server components above
+          it construct the route definitions, while <code>Router</code> and its
+          runtime dependencies run in the browser.
         </p>
-        <CodeBlock language="tsx">{`// ClientApp.tsx — a Client Component
-"use client";
-
-import { Router, type RouteDefinition } from "@funstack/router";
-
-export function ClientApp({ routes }: { routes: RouteDefinition[] }) {
-  return <Router routes={routes} />;
-}`}</CodeBlock>
         <p>
-          This is the <code>"use client"</code> boundary. Everything above it
-          (the route definitions, the page component imports) stays in the
-          server module graph. The <code>Router</code> and its runtime
-          dependencies are in the client bundle.
+          Route definitions (paths, component references, children) are plain
+          serializable data, so they can be passed from a server component into{" "}
+          <code>Router</code> as props.
         </p>
       </section>
 
@@ -115,18 +110,14 @@ export function ClientApp({ routes }: { routes: RouteDefinition[] }) {
         <h3>Defining Routes in the Server Context</h3>
         <p>
           Because route definitions are plain data (paths, component references,
-          loaders, and children), they can be constructed entirely on the
-          server. The <code>route()</code> helper from{" "}
-          <code>@funstack/router/server</code> produces the same{" "}
-          <code>RouteDefinition</code> objects as the one from the main entry
-          point &mdash; the only difference is that it does not pull in
-          client-side code.
-        </p>
-        <p>
-          This means you can take advantage of server-only features when
-          building your route tree:
+          and children), they can be constructed entirely on the server. The{" "}
+          <code>route()</code> helper from <code>@funstack/router/server</code>{" "}
+          produces the same <code>RouteDefinition</code> objects as the one from
+          the main entry point &mdash; the only difference is that it does not
+          pull in client-side code.
         </p>
         <CodeBlock language="tsx">{`// App.tsx — Server Component
+import { Router } from "@funstack/router";
 import { route } from "@funstack/router/server";
 import { lazy } from "react";
 
@@ -140,21 +131,64 @@ const routes = [
     component: <Layout />,
     children: [
       route({ path: "/", component: HomePage }),
-      route({
-        path: "/dashboard",
-        component: DashboardPage,
-        loader: async ({ params }) => fetchDashboardData(),
-      }),
+      route({ path: "/dashboard", component: DashboardPage }),
       route({ path: "/settings", component: SettingsPage }),
     ],
   }),
-];`}</CodeBlock>
+];
+
+export default function App() {
+  return <Router routes={routes} />;
+}`}</CodeBlock>
         <p>
           Note that page components referenced in route definitions can be
           either server components or client components. When a page component
           uses hooks or browser APIs, it should have the{" "}
           <code>"use client"</code> directive. Otherwise, it can remain a server
           component for optimal performance.
+        </p>
+
+        <h4>Loaders in an RSC Context</h4>
+        <p>
+          Loaders run client-side &mdash; they execute in the browser when a
+          route is matched. This means a loader function cannot be defined
+          inline within a server module. Instead, define the loader in a client
+          module and import it:
+        </p>
+        <CodeBlock language="tsx">{`// loaders/dashboard.ts — a Client Module
+"use client";
+
+export async function dashboardLoader({ params }: LoaderArgs) {
+  const res = await fetch(\`/api/dashboard/\${params.id}\`);
+  return res.json();
+}`}</CodeBlock>
+        <CodeBlock language="tsx">{`// App.tsx — Server Component
+import { Router } from "@funstack/router";
+import { route } from "@funstack/router/server";
+import { dashboardLoader } from "./loaders/dashboard.js";
+
+const routes = [
+  route({
+    component: <Layout />,
+    children: [
+      route({ path: "/", component: HomePage }),
+      route({
+        path: "/dashboard/:id",
+        component: DashboardPage,
+        loader: dashboardLoader,
+      }),
+    ],
+  }),
+];
+
+export default function App() {
+  return <Router routes={routes} />;
+}`}</CodeBlock>
+        <p>
+          By placing the loader in a <code>"use client"</code> module, it is
+          included in the client bundle where it can access browser APIs. The
+          server component imports the reference and passes it as part of the
+          route definition.
         </p>
       </section>
 
@@ -194,8 +228,8 @@ export default function Root({ children }: { children: ReactNode }) {
   );
 }`}</CodeBlock>
         <CodeBlock language="tsx">{`// App.tsx — Server Component (route definitions)
+import { Router } from "@funstack/router";
 import { route } from "@funstack/router/server";
-import { ClientApp } from "./ClientApp.js";
 import { Layout } from "./components/Layout.js";
 import { HomePage } from "./pages/HomePage.js";
 import { AboutPage } from "./pages/AboutPage.js";
@@ -211,21 +245,12 @@ const routes = [
 ];
 
 export default function App() {
-  return <ClientApp routes={routes} />;
-}`}</CodeBlock>
-        <CodeBlock language="tsx">{`// ClientApp.tsx — Client Component (renders the Router)
-"use client";
-
-import { Router, type RouteDefinition } from "@funstack/router";
-
-export function ClientApp({ routes }: { routes: RouteDefinition[] }) {
   return <Router routes={routes} fallback="static" />;
 }`}</CodeBlock>
         <p>
           In this setup, <code>Root</code> and <code>App</code> are server
           components. The route definitions are constructed on the server and
-          passed through the <code>"use client"</code> boundary into{" "}
-          <code>ClientApp</code>, which renders the <code>Router</code>.
+          passed into <code>Router</code>, which acts as the client boundary.
         </p>
       </section>
 
@@ -238,13 +263,17 @@ export function ClientApp({ routes }: { routes: RouteDefinition[] }) {
             pulling client code into the server module graph
           </li>
           <li>
-            The <code>Router</code> component is a client component &mdash; wrap
-            it in a thin <code>"use client"</code> module that receives routes
-            as props
+            <code>Router</code> is a client component and serves as the client
+            boundary &mdash; render it directly from your server component
           </li>
           <li>
             Route definitions are plain data and can be constructed entirely on
             the server
+          </li>
+          <li>
+            Loaders run client-side &mdash; define them in{" "}
+            <code>"use client"</code> modules and import them into your route
+            definitions
           </li>
           <li>
             Page components can be either server components or client components
