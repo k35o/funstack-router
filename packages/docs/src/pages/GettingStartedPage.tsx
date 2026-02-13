@@ -16,6 +16,21 @@ yarn add @funstack/router`}</CodeBlock>
       </section>
 
       <section>
+        <h2>AI Coding Agent Support</h2>
+        <p>
+          <code>@funstack/router</code> ships with an Agent skill that gives
+          your coding assistant (Claude Code, Cursor, GitHub Copilot, etc.)
+          knowledge about the router's API and best practices. After installing
+          the package, run:
+        </p>
+        <CodeBlock language="bash">{`npx funstack-router-skill-installer`}</CodeBlock>
+        <p>
+          The installer will guide you through setting up the skill for your
+          preferred AI agent.
+        </p>
+      </section>
+
+      <section>
         <h2>Browser Support</h2>
         <p>
           FUNSTACK Router uses the{" "}
@@ -27,7 +42,7 @@ yarn add @funstack/router`}</CodeBlock>
             Navigation API
           </a>{" "}
           which is supported in Chrome 102+, Edge 102+, Firefox 147+, Safari
-          26.2+, and Opera 88+.
+          26.2+.
         </p>
       </section>
 
