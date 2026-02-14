@@ -8,9 +8,7 @@ export function LearnTransitionsPage() {
       <p className="page-intro">
         FUNSTACK Router wraps navigations in React's{" "}
         <code>startTransition</code>, which means the old UI may stay visible
-        while the new route loads. Sync state updates (<code>setStateSync</code>{" "}
-        and <code>resetStateSync</code>) bypass transitions entirely for
-        immediate responsiveness. This page explains how this works and how to
+        while the new route loads. This page explains how this works and how to
         control it.
       </p>
 
@@ -99,55 +97,6 @@ function Layout() {
       </section>
 
       <section>
-        <h3>Sync State Updates Bypass Transitions</h3>
-        <p>
-          Not every state change needs the transition treatment.{" "}
-          <code>setStateSync</code> and <code>resetStateSync</code> use the
-          Navigation API's <code>updateCurrentEntry()</code> method, which
-          changes state without performing a navigation. The router detects this
-          and applies the update synchronously &mdash; outside of{" "}
-          <code>startTransition</code>. As a result:
-        </p>
-        <ul>
-          <li>
-            The update is reflected in the UI immediately &mdash; there is no
-            pending phase.
-          </li>
-          <li>
-            <code>useIsPending()</code> (and the <code>isPending</code> prop)
-            will <strong>not</strong> become <code>true</code>.
-          </li>
-        </ul>
-        <p>
-          This makes <code>setStateSync</code> ideal for high-frequency or
-          low-latency updates such as tracking scroll position, toggling UI
-          elements, or updating form state that is stored in navigation state.
-        </p>
-        <CodeBlock language="tsx">{`function ProductList({ state, setStateSync }: Props) {
-  const sortBy = state?.sortBy ?? "name";
-
-  return (
-    <select
-      value={sortBy}
-      onChange={(e) =>
-        // Synchronous, no transition, no isPending flicker
-        setStateSync({ sortBy: e.target.value })
-      }
-    >
-      <option value="name">Sort by Name</option>
-      <option value="price">Sort by Price</option>
-    </select>
-  );
-}`}</CodeBlock>
-        <p>
-          In contrast, <code>setState</code> performs a replace navigation
-          internally, so it <em>does</em> go through{" "}
-          <code>startTransition</code> and may set <code>isPending</code> to{" "}
-          <code>true</code> if the resulting render suspends.
-        </p>
-      </section>
-
-      <section>
         <h3>Opting Out of Transitions</h3>
         <p>
           Sometimes you want to show a loading fallback immediately instead of
@@ -190,6 +139,80 @@ function UserDetailPage({
           navigations where the old page is still a reasonable placeholder
           (e.g., navigating between completely different pages), the default
           transition behavior is usually the better experience.
+        </p>
+      </section>
+
+      <section>
+        <h3>Sync State Updates Bypass Transitions</h3>
+        <p>
+          FUNSTACK Router allows you to save state in a navigation entry, which
+          is useful for form state or other UI state that should persist when
+          the user navigates back and forth. You can update this state using the{" "}
+          <code>setState</code> and <code>resetState</code> functions passed to
+          route components. These functions use a replace navigation internally,
+          so they trigger a transition.
+        </p>
+        <p>
+          In rare cases, you may want to update navigation state without
+          triggering a transition. <code>setStateSync</code> and{" "}
+          <code>resetStateSync</code> are designed for this purpose. When you
+          call them, the Router updates the current history entry using the
+          Navigation API's <code>updateCurrentEntry()</code> method, which does
+          not trigger a navigation. The Router detects this and applies the
+          update synchronously, outside of <code>startTransition</code>. As a
+          result:
+        </p>
+        <ul>
+          <li>
+            The update is reflected in the UI immediately &mdash; there is no
+            pending phase.
+          </li>
+          <li>
+            <code>useIsPending()</code> (and the <code>isPending</code> prop)
+            will <strong>not</strong> become <code>true</code>.
+          </li>
+          <li>
+            If the update causes a component to suspend, React will show the
+            fallback immediately instead of waiting for the transition to end.
+          </li>
+        </ul>
+        <h4>When to Use Sync State Updates</h4>
+        <p>
+          When it comes to `setState` vs `setStateSync`, you can think in the
+          same way as you would with wrapping state updates in `startTransition`
+          or not. A general guideline is to{" "}
+          <strong>
+            just use <code>setState</code> (with transition)
+          </strong>{" "}
+          when you don't have a specific reason to avoid it. The exception is
+          when the state change <em>already happened</em> on the screen and you
+          just want to reflect it in the navigation entry state.
+        </p>
+        <p>
+          A typical example of this is a form where you want to save the current
+          input value in the navigation state, so that if the user navigates
+          away and then back, their input is preserved. In this case, you would
+          call <code>setStateSync</code> in the input's <code>onChange</code>{" "}
+          handler, because the state update is already reflected in the input's
+          value and you don't want to trigger a transition for this:
+        </p>
+        <CodeBlock language="tsx">{`function MyForm({ state, setStateSync }: { state: State; setStateSync: (state: State) => void }) {
+  const [inputValue, setInputValue] = useState(state.inputValue ?? "");
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setInputValue(newValue);
+    setStateSync({ inputValue: newValue }); // Save to navigation state without transition
+  };
+
+  return <input value={inputValue} onChange={handleChange} />;
+}`}</CodeBlock>
+        <p>
+          In this example, using <code>setState</code> (with transition) would
+          cause the UI to enter a pending state on every keystroke, which would
+          be a poor user experience. By using <code>setStateSync</code>, the
+          navigation state updates seamlessly without triggering transitions or
+          pending states.
         </p>
       </section>
     </div>
