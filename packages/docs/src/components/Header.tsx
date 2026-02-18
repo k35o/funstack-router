@@ -4,11 +4,11 @@ import { useState } from "react";
 import { useCurrentPath } from "../hooks/useCurrentPath";
 
 const navItems = [
-  { path: "/funstack-router/", label: "Home" },
-  { path: "/funstack-router/getting-started", label: "Getting Started" },
-  { path: "/funstack-router/learn", label: "Learn" },
-  { path: "/funstack-router/api", label: "API Reference" },
-  { path: "/funstack-router/examples", label: "Examples" },
+  { path: "/", label: "Home" },
+  { path: "/getting-started", label: "Getting Started" },
+  { path: "/learn", label: "Learn" },
+  { path: "/api", label: "API Reference" },
+  { path: "/examples", label: "Examples" },
 ];
 
 export function Header() {
@@ -18,19 +18,16 @@ export function Header() {
   const isActive = (path: string) => {
     if (currentPath === null) return false;
     // Handle API Reference section (match any /api/* path)
-    if (path === "/funstack-router/api") {
-      return currentPath.startsWith("/funstack-router/api");
+    if (path === "/api") {
+      return currentPath.startsWith("/api");
     }
     // Handle Learn section (match any /learn/* path)
-    if (path === "/funstack-router/learn") {
-      return currentPath.startsWith("/funstack-router/learn");
+    if (path === "/learn") {
+      return currentPath.startsWith("/learn");
     }
     // Handle home path
-    if (path === "/funstack-router/") {
-      return (
-        currentPath === "/funstack-router/" ||
-        currentPath === "/funstack-router"
-      );
+    if (path === "/") {
+      return currentPath === "/" || currentPath === "";
     }
     return currentPath === path;
   };
@@ -41,7 +38,7 @@ export function Header() {
     <header className="header">
       <div className="header-content">
         <h1 className="logo">
-          <a href="/funstack-router/">FUNSTACK Router</a>
+          <a href="/">FUNSTACK Router</a>
         </h1>
         <nav className="nav">
           {navItems.map((item) => (

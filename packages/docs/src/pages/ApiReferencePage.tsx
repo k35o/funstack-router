@@ -3,10 +3,10 @@
 import { Outlet, useLocation } from "@funstack/router";
 
 const apiNavItems = [
-  { path: "/funstack-router/api/components", label: "Components" },
-  { path: "/funstack-router/api/hooks", label: "Hooks" },
-  { path: "/funstack-router/api/utilities", label: "Utilities" },
-  { path: "/funstack-router/api/types", label: "Types" },
+  { path: "/api/components", label: "Components" },
+  { path: "/api/hooks", label: "Hooks" },
+  { path: "/api/utilities", label: "Utilities" },
+  { path: "/api/types", label: "Types" },
 ];
 
 export function ApiReferencePage() {

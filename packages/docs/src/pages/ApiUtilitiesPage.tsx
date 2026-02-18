@@ -307,9 +307,7 @@ const routes = [
         </p>
         <p>
           See the{" "}
-          <a href="/funstack-router/learn/react-server-components">
-            React Server Components
-          </a>{" "}
+          <a href="/learn/react-server-components">React Server Components</a>{" "}
           guide for a full walkthrough of using the server entry point.
         </p>
       </article>

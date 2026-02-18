@@ -16,7 +16,7 @@ export function HomePage() {
           </a>
         </p>
         <img
-          src="/funstack-router/FUNSTACK_Router_Hero_small.png"
+          src="/FUNSTACK_Router_Hero_small.png"
           alt="FUNSTACK Router"
           className="hero-image"
         />
@@ -26,10 +26,10 @@ export function HomePage() {
           solution for React applications by leveraging the latest web APIs.
         </p>
         <div className="hero-buttons">
-          <a href="/funstack-router/getting-started" className="button primary">
+          <a href="/getting-started" className="button primary">
             Get Started
           </a>
-          <a href="/funstack-router/api" className="button secondary">
+          <a href="/api" className="button secondary">
             API Reference
           </a>
         </div>
@@ -74,9 +74,7 @@ export function HomePage() {
             <h3>RSC Compatible</h3>
             <p>
               Designed to work with React Server Components.{" "}
-              <a href="/funstack-router/learn/react-server-components">
-                Learn more
-              </a>
+              <a href="/learn/react-server-components">Learn more</a>
             </p>
           </div>
         </div>

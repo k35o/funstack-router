@@ -8,7 +8,7 @@ export function ApiReferenceIndexPage() {
 
       <section className="api-category">
         <h2>
-          <a href="/funstack-router/api/components">Components</a>
+          <a href="/api/components">Components</a>
         </h2>
         <p>Core components for building routing in your React application.</p>
         <ul>
@@ -25,7 +25,7 @@ export function ApiReferenceIndexPage() {
 
       <section className="api-category">
         <h2>
-          <a href="/funstack-router/api/hooks">Hooks</a>
+          <a href="/api/hooks">Hooks</a>
         </h2>
         <p>React hooks for accessing router state and navigation.</p>
         <ul>
@@ -59,7 +59,7 @@ export function ApiReferenceIndexPage() {
 
       <section className="api-category">
         <h2>
-          <a href="/funstack-router/api/utilities">Utilities</a>
+          <a href="/api/utilities">Utilities</a>
         </h2>
         <p>Helper functions for defining routes and managing state.</p>
         <ul>
@@ -74,7 +74,7 @@ export function ApiReferenceIndexPage() {
 
       <section className="api-category">
         <h2>
-          <a href="/funstack-router/api/types">Types</a>
+          <a href="/api/types">Types</a>
         </h2>
         <p>TypeScript types and interfaces exported by the router.</p>
         <ul>

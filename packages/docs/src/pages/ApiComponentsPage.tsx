@@ -83,10 +83,8 @@ export function ApiComponentsPage() {
                 Routes with loaders are always skipped during SSR. Once the
                 client hydrates, the real URL from the Navigation API takes
                 over. See the{" "}
-                <a href="/funstack-router/learn/server-side-rendering">
-                  SSR guide
-                </a>{" "}
-                for details.
+                <a href="/learn/server-side-rendering">SSR guide</a> for
+                details.
               </td>
             </tr>
           </tbody>

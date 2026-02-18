@@ -255,9 +255,8 @@ export default function App() {
         <p>
           If the server knows the requested pathname, you can pass it via the{" "}
           <code>ssrPathname</code> prop so that path-based routes render during
-          SSR (see the{" "}
-          <a href="/funstack-router/learn/server-side-rendering">SSR guide</a>{" "}
-          for details):
+          SSR (see the <a href="/learn/server-side-rendering">SSR guide</a> for
+          details):
         </p>
         <CodeBlock language="tsx">{`export default function App({ pathname }: { pathname: string }) {
   return (
@@ -297,9 +296,7 @@ export default function App() {
           </li>
           <li>
             See also the{" "}
-            <a href="/funstack-router/learn/server-side-rendering">
-              Server-Side Rendering
-            </a>{" "}
+            <a href="/learn/server-side-rendering">Server-Side Rendering</a>{" "}
             guide for how the router handles SSR and hydration
           </li>
         </ul>

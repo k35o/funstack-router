@@ -9,7 +9,7 @@ export function LearnIndexPage() {
 
       <section className="learn-category">
         <h2>
-          <a href="/funstack-router/learn/navigation-api">Navigation API</a>
+          <a href="/learn/navigation-api">Navigation API</a>
         </h2>
         <p>
           Understand the Navigation API that powers FUNSTACK Router. Learn how
@@ -21,7 +21,7 @@ export function LearnIndexPage() {
 
       <section className="learn-category">
         <h2>
-          <a href="/funstack-router/learn/nested-routes">Nested Routes</a>
+          <a href="/learn/nested-routes">Nested Routes</a>
         </h2>
         <p>
           Learn how to create layouts that persist across navigation, build
@@ -34,7 +34,7 @@ export function LearnIndexPage() {
 
       <section className="learn-category">
         <h2>
-          <a href="/funstack-router/learn/type-safety">Type Safety</a>
+          <a href="/learn/type-safety">Type Safety</a>
         </h2>
         <p>
           Discover how to access route params, navigation state, and loader data
@@ -46,9 +46,7 @@ export function LearnIndexPage() {
       </section>
       <section className="learn-category">
         <h2>
-          <a href="/funstack-router/learn/server-side-rendering">
-            Server-Side Rendering
-          </a>
+          <a href="/learn/server-side-rendering">Server-Side Rendering</a>
         </h2>
         <p>
           Learn how FUNSTACK Router behaves during server-side rendering.
@@ -59,9 +57,7 @@ export function LearnIndexPage() {
       </section>
       <section className="learn-category">
         <h2>
-          <a href="/funstack-router/learn/react-server-components">
-            React Server Components
-          </a>
+          <a href="/learn/react-server-components">React Server Components</a>
         </h2>
         <p>
           Learn how to use FUNSTACK Router with React Server Components. Define
@@ -72,9 +68,7 @@ export function LearnIndexPage() {
       </section>
       <section className="learn-category">
         <h2>
-          <a href="/funstack-router/learn/transitions">
-            Controlling Transitions
-          </a>
+          <a href="/learn/transitions">Controlling Transitions</a>
         </h2>
         <p>
           Learn how FUNSTACK Router uses React transitions to keep the old UI

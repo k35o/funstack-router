@@ -3,18 +3,18 @@
 import { Outlet, useLocation } from "@funstack/router";
 
 const learnNavItems = [
-  { path: "/funstack-router/learn/navigation-api", label: "Navigation API" },
-  { path: "/funstack-router/learn/nested-routes", label: "Nested Routes" },
-  { path: "/funstack-router/learn/type-safety", label: "Type Safety" },
+  { path: "/learn/navigation-api", label: "Navigation API" },
+  { path: "/learn/nested-routes", label: "Nested Routes" },
+  { path: "/learn/type-safety", label: "Type Safety" },
   {
-    path: "/funstack-router/learn/server-side-rendering",
+    path: "/learn/server-side-rendering",
     label: "Server-Side Rendering",
   },
   {
-    path: "/funstack-router/learn/react-server-components",
+    path: "/learn/react-server-components",
     label: "React Server Components",
   },
-  { path: "/funstack-router/learn/transitions", label: "Transitions" },
+  { path: "/learn/transitions", label: "Transitions" },
 ];
 
 export function LearnPage() {
