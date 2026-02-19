@@ -24,8 +24,8 @@ importers:
         specifier: workspace:*
         version: link:../router
       '@funstack/static':
-        specifier: ^0.0.8
-        version: 0.0.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@7.3.1(@types/node@25.2.3))
+        specifier: ^0.0.9
+        version: 0.0.9(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@7.3.1(@types/node@25.2.3))
       react:
         specifier: ^19.2.4
         version: 19.2.4
@@ -657,8 +657,8 @@ packages:
     resolution: {integrity: sha512-lEYZQ4tFOLidvxy60tE7/28LUy4bJOlbT8o0ebcolaFV/cluSGtnDpWEUWIQWORtnGhrWnYl7Gr9aHvjHYkoEQ==}
     hasBin: true
 
-  '@funstack/static@0.0.8':
-    resolution: {integrity: sha512-IVtdfNYboyK5G5rq3GZlIv8Am6jAiUKdrW3ToRibG7NYSGXHpFX2gtgjFpQV36FQiJY1DYnRfZUZbYyE4/cAxQ==}
+  '@funstack/static@0.0.9':
+    resolution: {integrity: sha512-Elze7q6lqK9ohQYiVwDHBA77iUVT4AfQ9IiWtbl1rGnY6Q9Cpds8rbguj4b61Bj5jrnDc6XWwSTRPxXqoWbjrA==}
     hasBin: true
     peerDependencies:
       react: ^19.2.3
@@ -2532,7 +2532,7 @@ snapshots:
 
   '@funstack/skill-installer@1.0.0': {}
 
-  '@funstack/static@0.0.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@7.3.1(@types/node@25.2.3))':
+  '@funstack/static@0.0.9(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@7.3.1(@types/node@25.2.3))':
     dependencies:
       '@funstack/skill-installer': 1.0.0
       '@vitejs/plugin-rsc': 0.5.20(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@7.3.1(@types/node@25.2.3))
