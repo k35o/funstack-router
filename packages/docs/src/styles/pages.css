@@ -46,7 +46,7 @@
 /* Home Page */
 .hero {
   text-align: center;
-  padding: 64px 0;
+  padding: 64px 0 32px;
 }
 
 .hero h1 {
@@ -77,8 +77,29 @@
   justify-content: center;
 }
 
+.selling-points {
+  padding: 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.selling-point h2 {
+  font-size: 1.5rem;
+  margin: 0 0 12px;
+  padding: 0;
+  border: none;
+  color: var(--color-text);
+}
+
+.selling-point p {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  margin: 0;
+}
+
 .features {
-  padding: 48px 0;
+  padding: 24px 0;
 }
 
 .feature-grid {
