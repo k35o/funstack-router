@@ -113,34 +113,6 @@ const routes = [
     component: UserProfile,
   }),
 ];`}</CodeBlock>
-        <p>
-          Alternatively, you can use the <code>useParams</code> hook to access
-          parameters:
-        </p>
-        <CodeBlock language="tsx">{`import { useParams } from "@funstack/router";
-
-function UserProfile() {
-  const params = useParams<{ userId: string }>();
-  return <h1>User: {params.userId}</h1>;
-}`}</CodeBlock>
-      </section>
-
-      <section>
-        <h2>Programmatic Navigation</h2>
-        <p>
-          Use the <code>useNavigate</code> hook for programmatic navigation:
-        </p>
-        <CodeBlock language="tsx">{`import { useNavigate } from "@funstack/router";
-
-function MyComponent() {
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    navigate("/about");
-  };
-
-  return <button onClick={handleClick}>Go to About</button>;
-}`}</CodeBlock>
       </section>
 
       <section>
@@ -164,21 +136,21 @@ function UserProfilePage({
   data: Promise<User>;
   params: { userId: string };
 }) {
-  const user = use(data);
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <UserProfile user={user} params={params} />
+      <UserProfile data={data} params={params} />
     </Suspense>
   );
 }
 
 function UserProfile({
-  user,
+  data,
   params,
 }: {
-  user: User;
+  data: Promise<User>;
   params: { userId: string };
 }) {
+  const user = use(data);
   return (
     <div>
       <h1>{user.name}</h1>

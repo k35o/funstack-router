@@ -67,7 +67,7 @@ function UserPage({ params }: { params: { userId: string } }) {
           For explicit type annotations, use the{" "}
           <code>RouteComponentProps</code> type helper with your params type:
         </p>
-        <CodeBlock language="tsx">{`import { route, RouteComponentProps } from "@funstack/router";
+        <CodeBlock language="tsx">{`import { route, type RouteComponentProps } from "@funstack/router";
 
 // Define component with explicit props type
 function UserPage({ params }: RouteComponentProps<{ userId: string }>) {
@@ -97,7 +97,7 @@ const userRoute = route({
           for routes with loaders.
         </p>
         <CodeBlock language="tsx">{`import { use, Suspense } from "react";
-import { route, RouteComponentPropsWithData } from "@funstack/router";
+import { route, type RouteComponentPropsWithData } from "@funstack/router";
 
 interface User {
   id: string;
@@ -155,7 +155,7 @@ const userRoute = route({
           the current page). Use the <code>routeState</code> helper to define
           typed state for your routes.
         </p>
-        <CodeBlock language="tsx">{`import { route, routeState, RouteComponentProps } from "@funstack/router";
+        <CodeBlock language="tsx">{`import { routeState, RouteComponentProps } from "@funstack/router";
 
 // Define the state shape
 interface ProductListState {
@@ -209,12 +209,10 @@ function ProductListPage({
 }
 
 // Use routeState to create a typed route
-const productListRoute = routeState<ProductListState>()(
-  route({
-    path: "/products",
-    component: ProductListPage,
-  })
-);`}</CodeBlock>
+const productListRoute = routeState<ProductListState>()({
+  path: "/products",
+  component: ProductListPage,
+});`}</CodeBlock>
         <p>
           The <code>routeState</code> helper adds four props to your component:
         </p>
@@ -312,16 +310,14 @@ function ProductListPage(props: Props) {
 }
 
 // Route definition with both loader and state
-const productListRoute = routeState<ProductListState>()(
-  route({
-    path: "/products",
-    component: ProductListPage,
-    loader: async (): Promise<Product[]> => {
-      const response = await fetch("/api/products");
-      return response.json();
-    },
-  })
-);`}</CodeBlock>
+const productListRoute = routeState<ProductListState>()({
+  path: "/products",
+  component: ProductListPage,
+  loader: async (): Promise<Product[]> => {
+    const response = await fetch("/api/products");
+    return response.json();
+  },
+});`}</CodeBlock>
       </section>
 
       <section>

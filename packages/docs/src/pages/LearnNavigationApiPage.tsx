@@ -155,15 +155,12 @@ function Navigation() {
         <p>
           While FUNSTACK Router handles navigation for you, you can interact
           directly with the Navigation API when needed. This is useful for
-          features like scroll-to-top behavior or analytics tracking.
+          features like analytics tracking.
         </p>
         <CodeBlock language="tsx">{`import { useEffect } from "react";
 
 function App() {
   useEffect(() => {
-    const navigation = window.navigation;
-    if (!navigation) return;
-
     const controller = new AbortController();
 
     // Listen for successful navigation completion

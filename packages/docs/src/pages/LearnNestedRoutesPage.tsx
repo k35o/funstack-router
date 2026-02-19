@@ -338,7 +338,7 @@ const routes = [
         <CodeBlock language="tsx">{`import { use, Suspense } from "react";
 import { route, Outlet, useRouteData } from "@funstack/router";
 
-// Define the parent route with a loader
+// Define the parent route with a loader and child routes
 const teamRoute = route({
   id: "team",
   path: "/teams/:teamId",
@@ -347,9 +347,14 @@ const teamRoute = route({
     const response = await fetch(\`/api/teams/\${params.teamId}\`);
     return response.json();
   },
+  children: [
+    route({ path: "/", component: TeamOverview }),
+    route({ path: "/members", component: TeamMembers }),
+    route({ path: "/settings", component: TeamSettings }),
+  ],
 });
 
-// Parent layout loads team data once
+// Parent layout loads team data once, child routes render in <Outlet />
 function TeamLayoutContent({
   data,
 }: {
