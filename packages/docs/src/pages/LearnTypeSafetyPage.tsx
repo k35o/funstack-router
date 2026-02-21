@@ -321,7 +321,7 @@ const productListRoute = routeState<ProductListState>()({
       </section>
 
       <section>
-        <h3>Approach 2: Hooks</h3>
+        <h3 id="hooks">Approach 2: Hooks</h3>
 
         <h4>When to Use Hooks</h4>
         <p>
