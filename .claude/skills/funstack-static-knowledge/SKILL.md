@@ -1,6 +1,8 @@
 ---
 name: funstack-static-knowledge
 description: Use this skill when you need information about `@funstack/static` (the React framework your app is built with). What it is even about, API references, best practices, etc.
+metadata:
+  internal: true
 ---
 
 # FUNSTACK Static Knowledge

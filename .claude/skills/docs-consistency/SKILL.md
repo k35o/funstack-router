@@ -1,6 +1,8 @@
 ---
 name: docs-consistency
 description: Ensure consistency of documentation files. Should be used automatically when you made a significant change to the codebase that may affect the documentation, or when you made a significant change to the documentation itself.
+metadata:
+  internal: true
 ---
 
 # Docs Consistency Skill
