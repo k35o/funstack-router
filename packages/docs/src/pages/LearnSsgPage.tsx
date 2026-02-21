@@ -35,14 +35,6 @@ export function LearnSsgPage() {
           Once the client hydrates, the real URL from the Navigation API takes
           over and <code>ssr</code> is ignored.
         </p>
-        <CodeBlock language="tsx">{`// What renders at each stage with ssr:
-
-// Stage 1 (Server)                   Stage 2 (Client)
-// ───────────────────────────        ─────────────────
-// App shell (pathless routes)        App shell (pathless)
-// ✓ Path routes match                ✓ Path routes match
-//   (against ssr.path)                 (against real URL)
-// ✗ No loaders                       ✓ Loaders execute`}</CodeBlock>
       </section>
 
       <section>
@@ -80,9 +72,11 @@ export function LearnSsgPage() {
         <p>
           Use the <code>ssr</code> prop when your server or static site
           generator knows the URL being rendered and you want to include
-          page-specific content in the SSR output. This is particularly useful
-          for:
+          page-specific content in the SSR output. This is common for static
+          site generation, but can also be used in dynamic SSR scenarios where
+          the server can determine the URL at request time.
         </p>
+        <p>This is particularly useful for:</p>
         <ul>
           <li>
             Improving perceived performance by showing page content immediately

@@ -73,10 +73,6 @@
     grid-template-columns: 1fr;
   }
 
-  .api-nav {
-    flex-wrap: wrap;
-  }
-
   .props-table {
     font-size: 0.9rem;
   }

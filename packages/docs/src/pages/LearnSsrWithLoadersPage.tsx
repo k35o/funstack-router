@@ -34,14 +34,6 @@ export function LearnSsrWithLoadersPage() {
           the <code>data</code> prop. The server-rendered HTML includes the
           loader content, so users see the full page immediately.
         </p>
-        <CodeBlock language="tsx">{`// What renders at each stage with ssr + runLoaders:
-
-// Stage 1 (Server)                   Stage 2 (Client)
-// ───────────────────────────        ─────────────────
-// App shell (pathless routes)        App shell (pathless)
-// ✓ Path routes match                ✓ Path routes match
-//   (against ssr.path)                 (against real URL)
-// ✓ Loaders execute                  ✓ Loaders execute`}</CodeBlock>
       </section>
 
       <section>
@@ -84,7 +76,6 @@ export default function App({ pathname }: { pathname: string }) {
   return (
     <Router
       routes={routes}
-      fallback="static"
       ssr={{ path: pathname, runLoaders: true }}
     />
   );

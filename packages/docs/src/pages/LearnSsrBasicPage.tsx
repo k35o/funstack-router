@@ -149,10 +149,17 @@ function HomePage() {
       <section>
         <h3>Going Beyond the App Shell</h3>
         <p>
-          The default SSR behavior produces only the app shell. If your server
-          or build tool knows the URL being rendered, you can use the{" "}
-          <code>ssr</code> prop to match path-based routes during SSR for richer
-          output:
+          The default SSR behavior produces only the app shell. This is perfect
+          for ordinary SPAs where only one HTML page is served and the client
+          takes over all routing. SSR can still be useful in this scenario,
+          normally with a static site generator, to improve perceived
+          performance by showing the shell immediately while the rest of the
+          page loads.
+        </p>
+        <p>
+          If your server or build tool knows the URL being rendered, you can use
+          the <code>ssr</code> prop to match path-based routes during SSR for
+          richer output:
         </p>
         <ul>
           <li>

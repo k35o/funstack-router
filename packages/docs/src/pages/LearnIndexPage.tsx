@@ -3,8 +3,7 @@ export function LearnIndexPage() {
     <div className="learn-overview">
       <p className="page-intro">
         These guides teach you how to use <code>@funstack/router</code> through
-        practical, use-case-driven examples. Each guide builds on real-world
-        scenarios to help you understand not just how, but why.
+        practical, use-case-driven examples.
       </p>
 
       <section className="learn-category">
