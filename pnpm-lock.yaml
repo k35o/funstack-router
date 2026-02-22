@@ -35,9 +35,6 @@ importers:
       shiki:
         specifier: ^3.22.0
         version: 3.22.0
-      urlpattern-polyfill:
-        specifier: ^10.1.0
-        version: 10.1.0
     devDependencies:
       '@types/react':
         specifier: ^19.2.14
@@ -116,9 +113,6 @@ importers:
       typescript:
         specifier: ^5.7.0
         version: 5.9.3
-      urlpattern-polyfill:
-        specifier: ^10.1.0
-        version: 10.1.0
       vitest:
         specifier: ^4.0.18
         version: 4.0.18(@types/node@25.2.3)(jsdom@28.0.0)
@@ -1989,9 +1983,6 @@ packages:
     peerDependencies:
       browserslist: '>= 4.21.0'
 
-  urlpattern-polyfill@10.1.0:
-    resolution: {integrity: sha512-IGjKp/o0NL3Bso1PymYURCJxMPNAf/ILOpendP9f5B6e1rTJgdgiOvgfoT8VxCAdY+Wisb9uhGaJJf3yZ2V9nw==}
-
   vfile-message@4.0.3:
     resolution: {integrity: sha512-QTHzsGd1EhbZs4AsQ20JX1rC3cOlt/IWJruk893DfLRr57lcnOeMaWG4K0JrRta4mIJZKth2Au3mM3u03/JWKw==}
 
@@ -3804,8 +3795,6 @@ snapshots:
       browserslist: 4.28.1
       escalade: 3.2.0
       picocolors: 1.1.1
-
-  urlpattern-polyfill@10.1.0: {}
 
   vfile-message@4.0.3:
     dependencies:

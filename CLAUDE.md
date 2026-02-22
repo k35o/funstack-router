@@ -61,4 +61,4 @@ The router uses two React contexts:
 
 ### Testing
 
-Tests run in jsdom with `urlpattern-polyfill` (Navigation API is not available, so tests mock navigation behavior via `packages/router/src/__tests__/setup.ts`).
+Tests run in jsdom (Navigation API is not available, so tests mock navigation behavior via `packages/router/src/__tests__/setup.ts`).
