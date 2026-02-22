@@ -28,7 +28,7 @@ export function ClientApp({
           transition.navigationType === "push" ||
           transition.navigationType === "replace"
         ) {
-          // Safari is known to not scroll immediately after a push/replace navigation, so we wait a bit
+          // Safari is known to ignore scrolling immediately after a push/replace navigation, so we wait a bit
           // Also, Safari doesn't handle scrolling to 0, so we use the -1 trick
           setTimeout(() => {
             window.scrollTo(0, -1);
