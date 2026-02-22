@@ -52,7 +52,7 @@ The router uses two React contexts:
 - Uses URLPattern with `{/*}?` suffix for prefix matching
 - Params are merged from parent to child routes
 
-### Component Rendering (`packages/router/src/Router.tsx`)
+### Component Rendering (`packages/router/src/Router/index.tsx`)
 
 - `<Router>` subscribes to Navigation API via `useSyncExternalStore`
 - Intercepts navigation events and matches against route definitions
@@ -62,3 +62,17 @@ The router uses two React contexts:
 ### Testing
 
 Tests run in jsdom (Navigation API is not available, so tests mock navigation behavior via `packages/router/src/__tests__/setup.ts`).
+
+### Commit Messages
+
+- Use conventional commits format: `type(scope): description`
+
+To distinguish what should be included in the changelog, fixes in the docs or example packages should be marked with `docs` or `example` scope, respectively. For example:
+
+- `fix(docs): correct typo in README`
+- `fix(example): update dependencies in example package`
+
+Changes to the main router package can be left without a scope or marked with `router`:
+
+- `feat: add new API for navigation`
+- `feat(router): add new API for navigation`
