@@ -292,14 +292,13 @@ function RouteRenderer({
   // Extract this route's state from internal structure
   const internalState = locationEntry?.state as InternalRouteState | undefined;
   const routeState = internalState?.__routeStates?.[index];
+  const hasLocationEntry = locationEntry !== null;
 
   // Create stable setStateSync callback for this route's slice (synchronous via updateCurrentEntry)
   const setStateSync = useCallback(
     (stateOrUpdater: unknown | ((prev: unknown) => unknown)) => {
-      if (locationEntry === null) return;
-      const currentStates =
-        (locationEntry.state as InternalRouteState | undefined)
-          ?.__routeStates ?? [];
+      if (!hasLocationEntry) return;
+      const currentStates = internalState?.__routeStates ?? [];
       const currentRouteState = currentStates[index];
 
       const newState =
@@ -311,7 +310,7 @@ function RouteRenderer({
       newStates[index] = newState;
       updateCurrentEntryState({ __routeStates: newStates });
     },
-    [locationEntry?.state, index, updateCurrentEntryState],
+    [hasLocationEntry, internalState, index, updateCurrentEntryState],
   );
 
   // Create stable setState callback for this route's slice (async via replace navigation)
@@ -319,10 +318,8 @@ function RouteRenderer({
     async (
       stateOrUpdater: unknown | ((prev: unknown) => unknown),
     ): Promise<void> => {
-      if (locationEntry === null || url === null) return;
-      const currentStates =
-        (locationEntry.state as InternalRouteState | undefined)
-          ?.__routeStates ?? [];
+      if (!hasLocationEntry || url === null) return;
+      const currentStates = internalState?.__routeStates ?? [];
       const currentRouteState = currentStates[index];
 
       const newState =
@@ -338,26 +335,22 @@ function RouteRenderer({
         state: { __routeStates: newStates },
       });
     },
-    [locationEntry?.state, index, url, navigateAsync],
+    [hasLocationEntry, internalState, index, url, navigateAsync],
   );
 
   // Create stable resetStateSync callback (synchronous via updateCurrentEntry)
   const resetStateSync = useCallback(() => {
-    if (locationEntry === null) return;
-    const currentStates =
-      (locationEntry.state as InternalRouteState | undefined)?.__routeStates ??
-      [];
+    if (!hasLocationEntry) return;
+    const currentStates = internalState?.__routeStates ?? [];
     const newStates = [...currentStates];
     newStates[index] = undefined;
     updateCurrentEntryState({ __routeStates: newStates });
-  }, [locationEntry?.state, index, updateCurrentEntryState]);
+  }, [hasLocationEntry, internalState, index, updateCurrentEntryState]);
 
   // Create stable resetState callback (async via replace navigation)
   const resetState = useCallback(async (): Promise<void> => {
-    if (locationEntry === null || url === null) return;
-    const currentStates =
-      (locationEntry.state as InternalRouteState | undefined)?.__routeStates ??
-      [];
+    if (!hasLocationEntry || url === null) return;
+    const currentStates = internalState?.__routeStates ?? [];
     const newStates = [...currentStates];
     newStates[index] = undefined;
 
@@ -365,13 +358,16 @@ function RouteRenderer({
       replace: true,
       state: { __routeStates: newStates },
     });
-  }, [locationEntry?.state, index, url, navigateAsync]);
+  }, [hasLocationEntry, internalState, index, url, navigateAsync]);
 
   // Create outlet for child routes
-  const outlet =
-    index < matchedRoutes.length - 1 ? (
-      <RouteRenderer matchedRoutes={matchedRoutes} index={index + 1} />
-    ) : null;
+  const outlet = useMemo(
+    () =>
+      index < matchedRoutes.length - 1 ? (
+        <RouteRenderer matchedRoutes={matchedRoutes} index={index + 1} />
+      ) : null,
+    [matchedRoutes, index],
+  );
 
   // Extract id from route definition (if available)
   const routeId = (route as { id?: string }).id;

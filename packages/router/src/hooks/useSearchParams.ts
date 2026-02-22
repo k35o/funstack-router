@@ -23,6 +23,7 @@ export function useSearchParams(): [URLSearchParams, SetSearchParams] {
   }
 
   const currentUrl = context.url;
+  const { navigate } = context;
   const searchParams = currentUrl.searchParams;
 
   const setSearchParams = useCallback<SetSearchParams>(
@@ -43,9 +44,9 @@ export function useSearchParams(): [URLSearchParams, SetSearchParams] {
       }
 
       url.search = newParams.toString();
-      context.navigate(url.pathname + url.search + url.hash, { replace: true });
+      navigate(url.pathname + url.search + url.hash, { replace: true });
     },
-    [currentUrl, context.navigate],
+    [currentUrl, navigate],
   );
 
   return [searchParams, setSearchParams];
