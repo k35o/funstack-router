@@ -33,7 +33,7 @@ function toEntry(path: string): { ssrPath: string; outputPath: string } {
   }
   // Remove leading slash for outputPath
   const stripped = path.slice(1);
-  return { ssrPath: path, outputPath: `${stripped}/index.html` };
+  return { ssrPath: path, outputPath: `${stripped}.html` };
 }
 
 export default function getEntries(): EntryDefinition[] {
