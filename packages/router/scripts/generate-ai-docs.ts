@@ -4,21 +4,22 @@ import * as path from "node:path";
 const DOCS_PAGES_DIR = path.resolve("../docs/src/pages");
 const OUTPUT_DIR = path.resolve("dist/docs");
 
-// Content pages only — excludes layout wrappers (LearnPage, ApiReferencePage),
-// index/overview pages, home page, and 404 page.
-const CONTENT_PAGES = [
-  "GettingStartedPage.tsx",
-  "ApiComponentsPage.tsx",
-  "ApiHooksPage.tsx",
-  "ApiTypesPage.tsx",
-  "ApiUtilitiesPage.tsx",
-  "LearnNavigationApiPage.tsx",
-  "LearnNestedRoutesPage.tsx",
-  "LearnRscPage.tsx",
-  "LearnSsrPage.tsx",
-  "LearnTransitionsPage.tsx",
-  "LearnTypeSafetyPage.tsx",
-];
+// Non-content pages to exclude: layout wrappers, index/overview pages, home, 404.
+const EXCLUDED_PAGES = new Set([
+  "HomePage.tsx",
+  "NotFoundPage.tsx",
+  "LearnPage.tsx",
+  "ApiReferencePage.tsx",
+  "LearnIndexPage.tsx",
+  "ApiReferenceIndexPage.tsx",
+]);
+
+async function discoverContentPages(): Promise<string[]> {
+  const files = await fs.readdir(DOCS_PAGES_DIR);
+  return files
+    .filter((f) => f.endsWith("Page.tsx") && !EXCLUDED_PAGES.has(f))
+    .sort();
+}
 
 function extractMetadata(content: string) {
   // Extract title from <h1>...</h1> or <h2>...</h2>
@@ -95,9 +96,11 @@ function generateIndex(
 async function main() {
   await fs.mkdir(OUTPUT_DIR, { recursive: true });
 
+  const contentPages = await discoverContentPages();
+
   // Copy all content pages as-is
   await Promise.all(
-    CONTENT_PAGES.map(async (fileName) => {
+    contentPages.map(async (fileName) => {
       const source = path.join(DOCS_PAGES_DIR, fileName);
       const output = path.join(OUTPUT_DIR, fileName);
       await fs.copyFile(source, output);
@@ -106,7 +109,7 @@ async function main() {
 
   // Extract metadata and generate index
   const docs = await Promise.all(
-    CONTENT_PAGES.map(async (fileName) => {
+    contentPages.map(async (fileName) => {
       const content = await fs.readFile(
         path.join(DOCS_PAGES_DIR, fileName),
         "utf-8",
