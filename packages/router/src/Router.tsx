@@ -4,12 +4,16 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   useSyncExternalStore,
   useTransition,
 } from "react";
 import type { LocationEntry, RouterAdapter } from "./core/RouterAdapter.js";
-import { RouterContext } from "./context/RouterContext.js";
+import {
+  RouterContext,
+  type RouterContextValue,
+} from "./context/RouterContext.js";
 import { RouteContext } from "./context/RouteContext.js";
 import {
   BlockerContext,
@@ -125,11 +129,14 @@ export function Router({
 
   // Hydration-aware initial value: null during SSR/hydration, real on client-only mount
   const getSnapshot = useCallback(() => adapter.getSnapshot(), [adapter]);
+  const serverSnapshotCacheRef = useRef<ServerLocationSnapshot | null>(null);
   const getServerSnapshot = useCallback(() => {
     // During SSR/hydration, return special server snapshot object
     // that captures the real snapshot at the time of first render.
     // This allows us to detect hydration and sync to real snapshot on client.
-    return new ServerLocationSnapshot(adapter);
+    return (serverSnapshotCacheRef.current ??= new ServerLocationSnapshot(
+      adapter,
+    ));
   }, [adapter]);
   const initialEntry = useSyncExternalStore<
     LocationEntry | null | ServerLocationSnapshot
@@ -270,8 +277,9 @@ export function Router({
   }, [routes, adapter, urlObject, runLoaders, locationKey]);
 
   return useMemo(() => {
-    const routerContextValue = {
-      locationEntry: locationEntry,
+    const routerContextValue: RouterContextValue = {
+      locationState: locationEntry?.state,
+      locationInfo: locationEntry?.info,
       url: urlObject,
       isPending,
       navigate,
@@ -327,7 +335,8 @@ function RouteRenderer({
     throw new Error("RouteRenderer must be used within RouterContext");
   }
   const {
-    locationEntry,
+    locationState,
+    locationInfo,
     url,
     isPending,
     navigateAsync,
@@ -335,14 +344,12 @@ function RouteRenderer({
   } = routerContext;
 
   // Extract this route's state from internal structure
-  const internalState = locationEntry?.state as InternalRouteState | undefined;
+  const internalState = locationState as InternalRouteState | undefined;
   const routeState = internalState?.__routeStates?.[index];
-  const hasLocationEntry = locationEntry !== null;
 
   // Create stable setStateSync callback for this route's slice (synchronous via updateCurrentEntry)
   const setStateSync = useCallback(
     (stateOrUpdater: unknown | ((prev: unknown) => unknown)) => {
-      if (!hasLocationEntry) return;
       const currentStates = internalState?.__routeStates ?? [];
       const currentRouteState = currentStates[index];
 
@@ -355,7 +362,7 @@ function RouteRenderer({
       newStates[index] = newState;
       updateCurrentEntryState({ __routeStates: newStates });
     },
-    [hasLocationEntry, internalState, index, updateCurrentEntryState],
+    [internalState, index, updateCurrentEntryState],
   );
 
   // Create stable setState callback for this route's slice (async via replace navigation)
@@ -363,7 +370,7 @@ function RouteRenderer({
     async (
       stateOrUpdater: unknown | ((prev: unknown) => unknown),
     ): Promise<void> => {
-      if (!hasLocationEntry || url === null) return;
+      if (url === null) return;
       const currentStates = internalState?.__routeStates ?? [];
       const currentRouteState = currentStates[index];
 
@@ -380,21 +387,20 @@ function RouteRenderer({
         state: { __routeStates: newStates },
       });
     },
-    [hasLocationEntry, internalState, index, url, navigateAsync],
+    [internalState, index, url, navigateAsync],
   );
 
   // Create stable resetStateSync callback (synchronous via updateCurrentEntry)
   const resetStateSync = useCallback(() => {
-    if (!hasLocationEntry) return;
     const currentStates = internalState?.__routeStates ?? [];
     const newStates = [...currentStates];
     newStates[index] = undefined;
     updateCurrentEntryState({ __routeStates: newStates });
-  }, [hasLocationEntry, internalState, index, updateCurrentEntryState]);
+  }, [internalState, index, updateCurrentEntryState]);
 
   // Create stable resetState callback (async via replace navigation)
   const resetState = useCallback(async (): Promise<void> => {
-    if (!hasLocationEntry || url === null) return;
+    if (url === null) return;
     const currentStates = internalState?.__routeStates ?? [];
     const newStates = [...currentStates];
     newStates[index] = undefined;
@@ -403,7 +409,7 @@ function RouteRenderer({
       replace: true,
       state: { __routeStates: newStates },
     });
-  }, [hasLocationEntry, internalState, index, url, navigateAsync]);
+  }, [internalState, index, url, navigateAsync]);
 
   // Create outlet for child routes
   const outlet = useMemo(
@@ -455,7 +461,7 @@ function RouteRenderer({
     };
 
     // Ephemeral info from the current navigation
-    const info = locationEntry?.info;
+    const info = locationInfo;
 
     // When loader exists, data is defined and component expects data prop
     // When loader doesn't exist, data is undefined and component doesn't expect data prop

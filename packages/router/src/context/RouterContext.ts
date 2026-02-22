@@ -1,10 +1,17 @@
 import { createContext } from "react";
 import type { NavigateOptions } from "../types.js";
-import type { LocationEntry } from "../core/RouterAdapter.js";
 
 export type RouterContextValue = {
-  /** Current location entry (null during SSR) */
-  locationEntry: LocationEntry | null;
+  /**
+   * Current location state associated with the current location entry.
+   * Initially undefined. Also, it is undefined during SSR.
+   */
+  locationState: unknown;
+  /**
+   * Current location info associated with the current location entry.
+   * This is undefined during SSR.
+   */
+  locationInfo: unknown;
   /** Current URL (null during SSR) */
   url: URL | null;
   /** Whether a navigation transition is pending */
