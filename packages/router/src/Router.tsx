@@ -276,17 +276,30 @@ export function Router({
     return executeLoaders(matched, entryKey, request, signal);
   }, [routes, adapter, urlObject, runLoaders, locationKey]);
 
-  return useMemo(() => {
-    const routerContextValue: RouterContextValue = {
-      locationState: locationEntry?.state,
-      locationInfo: locationEntry?.info,
+  const locationState = locationEntry?.state;
+  const locationInfo = locationEntry?.info;
+  const routerContextValue: RouterContextValue = useMemo(
+    () => ({
+      locationState,
+      locationInfo,
       url: urlObject,
       isPending,
       navigate,
       navigateAsync,
       updateCurrentEntryState,
-    };
+    }),
+    [
+      locationState,
+      locationInfo,
+      urlObject,
+      isPending,
+      navigate,
+      navigateAsync,
+      updateCurrentEntryState,
+    ],
+  );
 
+  return useMemo(() => {
     const blockerContextValue = { registry: blockerRegistry };
 
     return (
@@ -298,16 +311,7 @@ export function Router({
         </RouterContext.Provider>
       </BlockerContext.Provider>
     );
-  }, [
-    navigate,
-    navigateAsync,
-    updateCurrentEntryState,
-    urlObject,
-    isPending,
-    locationEntry,
-    matchedRoutesWithData,
-    blockerRegistry,
-  ]);
+  }, [routerContextValue, matchedRoutesWithData, blockerRegistry]);
 }
 
 type RouteRendererProps = {
