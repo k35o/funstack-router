@@ -8,7 +8,7 @@ import {
   useSyncExternalStore,
   useTransition,
 } from "react";
-import type { LocationEntry } from "./core/RouterAdapter.js";
+import type { LocationEntry, RouterAdapter } from "./core/RouterAdapter.js";
 import { RouterContext } from "./context/RouterContext.js";
 import { RouteContext } from "./context/RouteContext.js";
 import {
@@ -94,13 +94,20 @@ export type RouterProps = {
 };
 
 /**
- * Special value returned as server snapshot during SSR/hydration.
+ * Special class returned as server snapshot during SSR/hydration.
  */
-const serverSnapshotSymbol = Symbol();
+class ServerLocationSnapshot {
+  actualLocationEntry: LocationEntry | null;
+  constructor(adapter: RouterAdapter) {
+    this.actualLocationEntry = adapter.getSnapshot();
+  }
+}
+
+function isServerSnapshot(value: unknown): value is ServerLocationSnapshot {
+  return value instanceof ServerLocationSnapshot;
+}
 
 const noopSubscribe = () => () => {};
-const getServerSnapshot = (): typeof serverSnapshotSymbol =>
-  serverSnapshotSymbol;
 
 export function Router({
   routes: inputRoutes,
@@ -118,22 +125,27 @@ export function Router({
 
   // Hydration-aware initial value: null during SSR/hydration, real on client-only mount
   const getSnapshot = useCallback(() => adapter.getSnapshot(), [adapter]);
+  const getServerSnapshot = useCallback(() => {
+    // During SSR/hydration, return special server snapshot object
+    // that captures the real snapshot at the time of first render.
+    // This allows us to detect hydration and sync to real snapshot on client.
+    return new ServerLocationSnapshot(adapter);
+  }, [adapter]);
   const initialEntry = useSyncExternalStore<
-    LocationEntry | null | typeof serverSnapshotSymbol
+    LocationEntry | null | ServerLocationSnapshot
   >(noopSubscribe, getSnapshot, getServerSnapshot);
 
   const [isPending, startTransition] = useTransition();
   const [locationEntryInternal, setLocationEntry] = useState<
-    LocationEntry | null | typeof serverSnapshotSymbol
+    LocationEntry | null | ServerLocationSnapshot
   >(initialEntry);
-  const locationEntry =
-    locationEntryInternal === serverSnapshotSymbol
-      ? null
-      : locationEntryInternal;
+  const locationEntry = isServerSnapshot(locationEntryInternal)
+    ? null
+    : locationEntryInternal;
 
   if (
-    locationEntryInternal === serverSnapshotSymbol &&
-    initialEntry !== serverSnapshotSymbol
+    isServerSnapshot(locationEntryInternal) &&
+    !isServerSnapshot(initialEntry)
   ) {
     // On second hydrated render on client, sync state with real snapshot
     // Rendering flow on hydration:
@@ -193,40 +205,74 @@ export function Router({
     [adapter],
   );
 
-  return useMemo(() => {
-    // Match routes and execute loaders
-    const matchedRoutesWithData = (() => {
-      if (locationEntry === null && !ssr?.runLoaders) {
-        // SSR/hydration without loader execution: match routes, data is undefined.
-        // Routes with loaders are skipped (skipLoaders: true).
-        const matched = matchRoutes(routes, ssr?.path ?? null, {
-          skipLoaders: true,
-        });
-        if (!matched) return null;
-        return matched.map((m) => ({ ...m, data: undefined }));
-      }
+  const url = useMemo(() => {
+    if (locationEntry) {
+      return locationEntry.url.toString();
+    }
+    if (ssr) {
+      const origin =
+        typeof window !== "undefined"
+          ? window.location.origin
+          : "http://localhost";
+      return new URL(ssr.path, origin).toString();
+    }
+    return null;
+  }, [locationEntry, ssr]);
+  /**
+   * URL object. Non-null when client-side or during SSR with ssr.path provided.
+   * Null during SSR without ssr.path.
+   */
+  const urlObject = useMemo(() => (url ? new URL(url) : null), [url]);
 
-      // Unified path: SSR with loaders or client-side.
-      // Both cases match routes normally and execute loaders.
-      const url = locationEntry
-        ? locationEntry.url
-        : new URL(ssr!.path, "http://localhost");
-      const matched = matchRoutes(routes, url.pathname);
+  /**
+   * Whether to run loaders.
+   * 1. Loaders are always run for rendering with URL available (client-side)
+   * 2. During SSR, loaders are only run if ssr.runLoaders is true and URL is available (ssr.path provided).
+   */
+  const runLoaders =
+    locationEntry !== null || (!!ssr?.runLoaders && urlObject !== null);
+
+  /**
+   * Key of location. This is used as the cache key for loader data saved in navigation entry.
+   */
+  const locationKey =
+    locationEntry?.key ??
+    (isServerSnapshot(locationEntryInternal)
+      ? locationEntryInternal.actualLocationEntry?.key
+      : null) ??
+    "ssr";
+
+  // Match routes and execute loaders
+  const matchedRoutesWithData = useMemo(() => {
+    if (!runLoaders) {
+      // SSR/hydration without loader execution: match routes, data is undefined.
+      // Routes with loaders are skipped (skipLoaders: true).
+      const matched = matchRoutes(routes, urlObject?.pathname ?? null, {
+        skipLoaders: true,
+      });
       if (!matched) return null;
+      return matched.map((m) => ({ ...m, data: undefined }));
+    }
 
-      const entryKey = locationEntry?.key ?? "ssr";
-      const request = createLoaderRequest(url);
-      const signal = locationEntry
-        ? adapter.getIdleAbortSignal()
-        : new AbortController().signal;
-      return executeLoaders(matched, entryKey, request, signal);
-    })();
+    if (urlObject === null) {
+      throw new Error("Invariant failure: loaders cannot run without URL.");
+    }
 
+    // Unified path: SSR with loaders or client-side.
+    // Both cases match routes normally and execute loaders.
+    const matched = matchRoutes(routes, urlObject.pathname);
+    if (!matched) return null;
+
+    const entryKey = locationKey;
+    const request = createLoaderRequest(urlObject);
+    const signal = adapter.getIdleAbortSignal();
+    return executeLoaders(matched, entryKey, request, signal);
+  }, [routes, adapter, urlObject, runLoaders, locationKey]);
+
+  return useMemo(() => {
     const routerContextValue = {
       locationEntry: locationEntry,
-      url:
-        locationEntry?.url ??
-        (ssr ? new URL(ssr.path, "http://localhost") : null),
+      url: urlObject,
       isPending,
       navigate,
       navigateAsync,
@@ -248,12 +294,11 @@ export function Router({
     navigate,
     navigateAsync,
     updateCurrentEntryState,
+    urlObject,
     isPending,
     locationEntry,
-    routes,
-    adapter,
+    matchedRoutesWithData,
     blockerRegistry,
-    ssr,
   ]);
 }
 
