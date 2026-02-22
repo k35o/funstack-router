@@ -86,6 +86,11 @@ const ExamplesPage = lazy(() =>
     default: m.ExamplesPage,
   })),
 );
+const FaqPage = lazy(() =>
+  import("./pages/FaqPage.js").then((m) => ({
+    default: m.FaqPage,
+  })),
+);
 const NotFoundPage = lazy(() =>
   import("./pages/NotFoundPage.js").then((m) => ({
     default: m.NotFoundPage,
@@ -219,6 +224,10 @@ export const routes = [
           route({
             path: "/examples",
             component: defer(<ExamplesPage />, { name: "ExamplesPage" }),
+          }),
+          route({
+            path: "/faq",
+            component: defer(<FaqPage />, { name: "FaqPage" }),
           }),
           route({
             path: "/*",

@@ -9,6 +9,7 @@ const navItems = [
   { path: "/learn", label: "Learn" },
   { path: "/api", label: "API Reference" },
   { path: "/examples", label: "Examples" },
+  { path: "/faq", label: "FAQ" },
 ];
 
 export function Header() {
