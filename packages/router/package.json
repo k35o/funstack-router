@@ -1,6 +1,6 @@
 {
   "name": "@funstack/router",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "A modern React router based on the Navigation API",
   "repository": {
     "type": "git",
