@@ -210,7 +210,7 @@ function App() {
               Ephemeral <code>info</code>
             </strong>{" "}
             &mdash; Pass non-persisted context data during navigation via{" "}
-            <code>navigation.navigate(url, {"{ info }"}))</code>
+            <code>navigation.navigate(url, {"{ info }"})</code>
           </li>
           <li>
             <strong>navigation.entries()</strong> &mdash; Access the full
