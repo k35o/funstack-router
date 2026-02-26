@@ -34,10 +34,11 @@ export function LearnActionsPage() {
       <section>
         <h3>How It Works</h3>
         <p>
-          When a <code>{'<form method="post">'}</code> is submitted inside a
-          route that defines an <code>action</code>, the router intercepts the
-          submission via the Navigation API instead of letting the browser send
-          it to the server. The flow is:
+          When a <code>{'<form method="post">'}</code> is submitted, the router
+          matches the form&rsquo;s destination URL against the route
+          definitions. If a matched route defines an <code>action</code>, the
+          router intercepts the submission via the Navigation API instead of
+          letting the browser send it to the server. The flow is:
         </p>
         <ol>
           <li>
@@ -59,7 +60,7 @@ export function LearnActionsPage() {
             The action&rsquo;s return value is passed to the route&rsquo;s{" "}
             <code>loader</code> as <code>actionResult</code>
           </li>
-          <li>The loader re-runs and the UI updates with fresh data</li>
+          <li>The loader runs and the UI updates with fresh data</li>
         </ol>
         <p>
           If the matched route does <strong>not</strong> define an action, the
@@ -163,9 +164,9 @@ const editRoute = route({
             with no server-side form handling), consider using React 19&rsquo;s{" "}
             <code>{"<form action={fn}>"}</code> pattern instead. When a form
             action is a <strong>function</strong> rather than a URL, the browser
-            will not attempt a server round-trip &mdash; it calls the function
-            directly, even before hydration completes (via React&rsquo;s
-            progressive enhancement for actions).
+            will not attempt a server round-trip on submission. Note that in a
+            client-only app the form will not work until React hydrates, since
+            the function only exists in the JavaScript bundle.
           </p>
           <p>
             In contrast, FUNSTACK Router&rsquo;s <code>action</code> intercepts
@@ -180,8 +181,8 @@ const editRoute = route({
         <h3>Action Result and Loader</h3>
         <p>
           When a route defines both an <code>action</code> and a{" "}
-          <code>loader</code>, the loader re-runs after the action completes.
-          The action&rsquo;s return value is passed to the loader via the{" "}
+          <code>loader</code>, the loader runs after the action completes. The
+          action&rsquo;s return value is passed to the loader via the{" "}
           <code>actionResult</code> parameter:
         </p>
         <CodeBlock language="typescript">{`action: async ({ request }) => {
