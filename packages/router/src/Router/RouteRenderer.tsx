@@ -19,11 +19,6 @@ export function RouteRenderer({
   // Get parent route context (null for root route)
   const parentRouteContext = useContext(RouteContext);
 
-  const match = matchedRoutes[index];
-  if (!match) return null;
-
-  const { route, params, pathname, data } = match;
-
   const routerContext = useContext(RouterContext);
   if (!routerContext) {
     throw new Error("RouteRenderer must be used within RouterContext");
@@ -36,6 +31,10 @@ export function RouteRenderer({
     navigateAsync,
     updateCurrentEntryState,
   } = routerContext;
+
+  const match = matchedRoutes[index];
+
+  const { route, params, pathname, data } = match ?? {};
 
   // Extract this route's state from internal structure
   const internalState = locationState as InternalRouteState | undefined;
@@ -60,13 +59,13 @@ export function RouteRenderer({
   );
 
   // Extract id from route definition (if available)
-  const routeId = (route as { id?: string }).id;
+  const routeId = (route as { id?: string } | undefined)?.id;
 
   const routeContextValue = useMemo(
     () => ({
       id: routeId,
-      params,
-      matchedPath: pathname,
+      params: params ?? {},
+      matchedPath: pathname ?? "",
       state: routeState,
       data,
       outlet,
@@ -74,6 +73,8 @@ export function RouteRenderer({
     }),
     [routeId, params, pathname, routeState, data, outlet, parentRouteContext],
   );
+
+  if (!match) return null;
 
   // Render component with or without data prop based on loader presence
   // Always pass params, state, setState, resetState, and info props to components
