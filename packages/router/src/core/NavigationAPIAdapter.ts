@@ -43,6 +43,10 @@ export class NavigationAPIAdapter implements RouterAdapter {
   #cachedEntryId: string | null = null;
   // Ephemeral info from the current navigation event (not persisted in history)
   #currentNavigationInfo: unknown = undefined;
+  // Per-entry reload counters, used to generate unique cache keys
+  // so that loaders re-execute on reload instead of returning cached results.
+  // Keyed by NavigationHistoryEntry.id.
+  #reloadCounts = new Map<string, number>();
 
   getSnapshot(): LocationEntry | null {
     const entry = navigation.currentEntry;
@@ -59,7 +63,7 @@ export class NavigationAPIAdapter implements RouterAdapter {
     this.#cachedEntryId = entry.id;
     this.#cachedSnapshot = {
       url: new URL(entry.url),
-      key: entry.id,
+      key: this.#effectiveKey(entry.id),
       state: entry.getState(),
       info: this.#currentNavigationInfo,
     };
@@ -117,12 +121,25 @@ export class NavigationAPIAdapter implements RouterAdapter {
       entry.addEventListener(
         "dispose",
         () => {
+          // clearLoaderCacheForEntry uses prefix matching, so it also clears
+          // reload-keyed caches (e.g., entryId:r1:0, entryId:r2:0, etc.)
           clearLoaderCacheForEntry(entryId);
           this.#subscribedEntryIds.delete(entryId);
+          this.#reloadCounts.delete(entryId);
         },
         { signal },
       );
     }
+  }
+
+  /**
+   * Compute the effective cache key for a given entry.
+   * Includes a reload suffix when the entry has been reloaded,
+   * so loaders get a fresh cache key and re-execute.
+   */
+  #effectiveKey(entryId: string): string {
+    const count = this.#reloadCounts.get(entryId) ?? 0;
+    return count > 0 ? `${entryId}:r${count}` : entryId;
   }
 
   navigate(to: string, options?: NavigateOptions): void {
@@ -222,6 +239,24 @@ export class NavigationAPIAdapter implements RouterAdapter {
 
       // Route match, so intercept
 
+      // On reload, increment the per-entry reload count so loaders get a
+      // fresh cache key and re-execute.  The old cache (under the previous
+      // key) remains intact for the pending UI shown during the React
+      // transition.  Stale reload caches (2+ generations old) are pruned.
+      if (event.navigationType === "reload") {
+        const entryId = navigation.currentEntry!.id;
+        const oldCount = this.#reloadCounts.get(entryId) ?? 0;
+        // Prune reload cache from 2 generations ago.  The immediately
+        // previous generation is kept because it may be the committed
+        // state shown as pending UI during the new transition.
+        if (oldCount >= 2) {
+          clearLoaderCacheForEntry(`${entryId}:r${oldCount - 1}`);
+        }
+        this.#reloadCounts.set(entryId, oldCount + 1);
+        // Invalidate snapshot so getSnapshot() picks up the new reload key
+        this.#cachedSnapshot = null;
+      }
+
       // Abort initial load's loaders if this is the first navigation
       if (idleController) {
         idleController.abort();
@@ -236,6 +271,10 @@ export class NavigationAPIAdapter implements RouterAdapter {
               "Navigation currentEntry is null during navigation interception",
             );
           }
+
+          // Compute effective cache key inside the handler where
+          // currentEntry already points to the correct (possibly new) entry.
+          const effectiveKey = this.#effectiveKey(currentEntry.id);
 
           let actionResult: unknown = undefined;
 
@@ -262,7 +301,7 @@ export class NavigationAPIAdapter implements RouterAdapter {
           // For form submissions, cache was cleared above so loaders re-execute with actionResult.
           const results = executeLoaders(
             matched,
-            currentEntry.id,
+            effectiveKey,
             request,
             event.signal,
             actionResult,
