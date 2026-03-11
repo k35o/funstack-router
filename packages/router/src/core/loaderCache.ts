@@ -6,6 +6,16 @@ import type {
 } from "../types.js";
 
 /**
+ * Wrapper for synchronous errors thrown by loaders.
+ * Cached instead of the raw error so the Router's useMemo doesn't throw.
+ * RouteRenderer checks for this class and re-throws the original error
+ * during rendering, where Error Boundaries can catch it.
+ */
+export class LoaderError {
+  constructor(public readonly error: unknown) {}
+}
+
+/**
  * Cache for loader results.
  * Key format: `${entryId}:${matchIndex}`
  */
@@ -28,7 +38,14 @@ function getOrCreateLoaderResult(
   const cacheKey = `${entryId}:${matchIndex}`;
 
   if (!loaderCache.has(cacheKey)) {
-    loaderCache.set(cacheKey, route.loader(args));
+    try {
+      loaderCache.set(cacheKey, route.loader(args));
+    } catch (error) {
+      // Wrap synchronous loader errors so they don't crash the Router
+      // during useMemo. RouteRenderer will unwrap and re-throw during
+      // rendering, where Error Boundaries can catch them.
+      loaderCache.set(cacheKey, new LoaderError(error));
+    }
   }
 
   return loaderCache.get(cacheKey);
