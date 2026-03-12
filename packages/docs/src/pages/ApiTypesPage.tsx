@@ -335,7 +335,24 @@ routeState<{ tab: string }>()({
   pathname: string;
   search: string;
   hash: string;
+  entryId: string | null;   // NavigationHistoryEntry.id
+  entryKey: string | null;  // NavigationHistoryEntry.key
 }`}</CodeBlock>
+        <p>
+          <code>entryId</code> and <code>entryKey</code> expose the
+          corresponding properties from the Navigation API's{" "}
+          <code>NavigationHistoryEntry</code>. <code>entryId</code> is a unique
+          identifier for the entry — a new id is assigned when the entry is
+          replaced. <code>entryKey</code> represents the slot in the entry list
+          and is stable across replacements. Both are <code>null</code> when the
+          Navigation API is unavailable (e.g., in static fallback mode).
+        </p>
+        <p>
+          <strong>Warning:</strong> Do not render these values directly in DOM,
+          as they are not available during SSR and will cause a hydration
+          mismatch. They are best suited for use as a React <code>key</code> or
+          in effects/callbacks.
+        </p>
       </article>
 
       <article className="api-item">

@@ -123,6 +123,26 @@ export type Location = {
   pathname: string;
   search: string;
   hash: string;
+  /**
+   * NavigationHistoryEntry.id — unique identifier for this entry.
+   * A new id is assigned when the entry is replaced.
+   * Null when Navigation API is unavailable.
+   *
+   * **Warning:** Do not render this value directly in DOM, as it is not
+   * available during SSR and will cause a hydration mismatch. Use it as a
+   * React `key` or in effects/callbacks instead.
+   */
+  entryId: string | null;
+  /**
+   * NavigationHistoryEntry.key — represents the slot in the entry list.
+   * Stable across replacements.
+   * Null when Navigation API is unavailable.
+   *
+   * **Warning:** Do not render this value directly in DOM, as it is not
+   * available during SSR and will cause a hydration mismatch. Use it as a
+   * React `key` or in effects/callbacks instead.
+   */
+  entryKey: string | null;
 };
 
 /**

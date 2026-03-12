@@ -14,6 +14,10 @@ export type RouterContextValue = {
   locationInfo: unknown;
   /** Current URL (null during SSR) */
   url: URL | null;
+  /** NavigationHistoryEntry.id — unique identifier for this entry. A new id is assigned when the entry is replaced. Null during SSR or when Navigation API is unavailable. */
+  entryId: string | null;
+  /** NavigationHistoryEntry.key — represents the slot in the entry list. Stable across replacements. Null during SSR or when Navigation API is unavailable. */
+  entryKey: string | null;
   /** Whether a navigation transition is pending */
   isPending: boolean;
   /** Navigate to a new URL and wait for completion */
